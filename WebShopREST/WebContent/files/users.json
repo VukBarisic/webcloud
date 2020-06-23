@@ -1,0 +1,18 @@
+[
+	{
+		"email": "vukbarisic1996@gmail.com",
+		"password": "12345",
+		"firstName": "Rack",
+		"lastName": "jackson",
+		"organisation": "mega",
+		"role": "admin"
+	},
+	{
+		"email": "man",
+		"password": "12345",
+		"firstName": "Rack",
+		"lastName": "jackson",
+		"organisation": "",
+		"role": "superadmin"
+	}
+]

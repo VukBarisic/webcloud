@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link href="css/toastr.min.css" type="text/css" rel="stylesheet"/>
+	<link href="css/toastr.css" type="text/css" rel="stylesheet"/>
+	<link href="css/index.css" type="text/css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+ 	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" ></script>
+    <script src="js/jquery-3.5.1.js"></script>
+	<script type="text/javascript" src="js/toastr.js"></script>
+	<script type="text/javascript" src="js/toastr.min.js"></script>
+	<script src="js/home_page.js"></script>
+	<title>VMs</title>
+</head>
+<body>
+<nav id = "index_nav" class="navbar navbar-expand-lg navbar-fixed-top navbar-dark bg-dark">
+  <a class="navbar-brand">WebCloud</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link">Home <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link">Link</a>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Dropdown
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" >Action</a>
+          <a class="dropdown-item" href="#">Another action</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="#">Something else here</a>
+        </div>
+      </li>
+    </ul>
+    <form class="form-inline my-2 my-lg-0">
+      <input class="form-control mr-sm-2" type="search" placeholder="Search"  id = "search-input" aria-label="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0"  id = "search-button" type="submit">Search</button>
+    </form>
+    <div align = "right">
+    <ul class="navbar-nav mr-auto">
+    <li class="nav-item dropdown" class="right">
+        <a class="nav-link dropdown-toggle" href="#" id="loggedUserDrop" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" id="logout" href="#">Logout</a>
+        </div>
+      </li>
+      </ul>
+     </div>
+  </div>
+</nav>
+<div id="div_center">
+</div>
+</body>
+</html>
