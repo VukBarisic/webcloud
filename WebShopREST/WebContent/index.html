@@ -24,10 +24,10 @@
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item active">
-        <a class="nav-link">Home <span class="sr-only">(current)</span></a>
+        <a class="nav-link" id = "home">Home <span class="sr-only">(current)</span></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link">Link</a>
+        <a class="nav-link" id="organizations">Organizations</a>
       </li>
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -35,24 +35,24 @@
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
           <a class="dropdown-item" >Action</a>
-          <a class="dropdown-item" href="#">Another action</a>
+          <a class="dropdown-item">Another action</a>
           <div class="dropdown-divider"></div>
-          <a class="dropdown-item" href="#">Something else here</a>
+          <a class="dropdown-item" >Something else here</a>
         </div>
       </li>
     </ul>
     <form class="form-inline my-2 my-lg-0">
       <input class="form-control mr-sm-2" type="search" placeholder="Search"  id = "search-input" aria-label="Search">
-      <button class="btn btn-outline-success my-2 my-sm-0"  id = "search-button" type="submit">Search</button>
+      <button class="btn btn-outline-success my-2 my-sm-0"  id = "search-button" type="button">Search</button>
     </form>
     <div align = "right">
     <ul class="navbar-nav mr-auto">
     <li class="nav-item dropdown" class="right">
-        <a class="nav-link dropdown-toggle" href="#" id="loggedUserDrop" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <a class="nav-link dropdown-toggle" id="loggedUserDrop" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <a class="dropdown-item" id="logout" href="#">Logout</a>
+          <a class="dropdown-item" id="logout">Logout</a>
         </div>
       </li>
       </ul>

@@ -1,8 +1,9 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class Organisation {
+public class Organization {
 
 //unique
 	private String name;
@@ -11,16 +12,24 @@ public class Organisation {
 	private List<User> users;
 	private List<String> resources;
 
-	public Organisation() {
+	public Organization() {
 	}
 
-	public Organisation(String name, String description, String logo, List<User> users, List<String> resources) {
+	public Organization(String name, String description, String logo, List<User> users, List<String> resources) {
 		super();
 		this.name = name;
 		this.description = description;
 		this.logo = logo;
 		this.users = users;
 		this.resources = resources;
+	}
+
+	public Organization(String name, String description, String logo) {
+		this.name = name;
+		this.description = description;
+		this.logo = logo;
+		this.users = new ArrayList<User>();
+		this.resources = new ArrayList<>();
 	}
 
 	public String getName() {

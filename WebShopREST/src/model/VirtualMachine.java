@@ -6,7 +6,7 @@ public class VirtualMachine {
 	//unique
 	private String name;
 	//mandatory
-	private Organisation organisation;
+	private Organization organization;
 	//mandatory
 	private VMcategory vMcategory;
 	private List<Activity> activities;

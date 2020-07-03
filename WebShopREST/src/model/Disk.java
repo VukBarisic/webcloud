@@ -5,7 +5,7 @@ public class Disk {
 	// unique
 	private String name;
 	// mandatory
-	private Organisation organisation;
+	private Organization organization;
 	// mandatory
 	private DiskType diskType;
 	// mandatory
@@ -13,10 +13,10 @@ public class Disk {
 	// mandatory
 	private VirtualMachine virtualMachine;
 
-	public Disk(String name, Organisation organisation, DiskType diskType, int capacity,
+	public Disk(String name, Organization organization, DiskType diskType, int capacity,
 			VirtualMachine virtualMachine) {
 		this.name = name;
-		this.organisation = organisation;
+		this.organization = organization;
 		this.diskType = diskType;
 		this.capacity = capacity;
 		this.virtualMachine = virtualMachine;
@@ -30,12 +30,12 @@ public class Disk {
 		this.name = name;
 	}
 
-	public Organisation getOrganisation() {
-		return organisation;
+	public Organization getOrganisation() {
+		return organization;
 	}
 
-	public void setOrganisation(Organisation organisation) {
-		this.organisation = organisation;
+	public void setOrganisation(Organization organization) {
+		this.organization = organization;
 	}
 
 	public DiskType getDiskType() {

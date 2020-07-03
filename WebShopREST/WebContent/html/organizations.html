@@ -1,7 +1,37 @@
-<button type="button" class="btn btn-info" data-toggle="modal" data-target="#uploadModal">Upload file</button>
+<style>
+#add_organization {
+	position: absolute;
+	left: 300px;
+}
+
+td {
+	width: 100%;
+	height: 100%;
+	text-align: center;
+}
+</style>
+<div id="organizations_div">
+	<p>Organizations</p>
+
+	<table class="table table-striped" id="organizationsTable">
+		<thead>
+			<tr>
+				<th>Logo</th>
+				<th>Description</th>
+				<th>Name</th>
+				<th>Buttons</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+
+	<button id="add_organization" class="btn btn-primary"
+		onclick="loadAddOrganization()">Add organization</button>
+</div>
 
 <!-- Modal -->
-<div id="editOrgModal" class="modal fade" role="dialog">
+<div id="editOrgModal" class="modal fade">
   <div class="modal-dialog">
 
     <!-- Modal content-->
@@ -17,8 +47,6 @@
           <input type='button' class='btn btn-info' value='Upload' id='btn_upload'>
         </form>
 
-        <!-- Preview-->
-        <div id='preview'></div>
       </div>
  
     </div>
