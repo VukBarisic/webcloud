@@ -1,1 +1,44 @@
-[{"name":"Apple incorporated","description":"apple inc","logo":"Appleincorporated.jpg","users":[],"resources":[]},{"name":"amazon incorp","description":"45","logo":"amazonincorp.jpg","users":[],"resources":[]},{"name":"icloud","description":"Cloud service","logo":"icloud.jpg","users":[],"resources":[]}]
+[
+	{
+		"name": "Apple incorporated",
+		"description": "apple inc",
+		"logo": "Appleincorporated.jpg",
+		"users": [],
+		"resources": [
+			{
+				"name": "M90.Apple incorporated",
+				"organization": "Apple incorporated",
+				"vMcategory": {
+					"name": "mac7",
+					"numberOfCores": 8,
+					"ram": 4,
+					"numOfGpuCores": 8
+				},
+				"activities": [],
+				"disks": [
+					{
+						"name": "disk",
+						"organization": "Apple incorporated",
+						"diskType": "HDD",
+						"capacity": 256,
+						"virtualMachine": "M90"
+					}
+				]
+			}
+		]
+	},
+	{
+		"name": "amazon incorp",
+		"description": "45",
+		"logo": "amazonincorp.jpg",
+		"users": [],
+		"resources": []
+	},
+	{
+		"name": "pixarc",
+		"description": "toy story",
+		"logo": "pixarc.jpg",
+		"users": [],
+		"resources": []
+	}
+]

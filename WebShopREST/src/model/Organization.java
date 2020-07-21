@@ -10,12 +10,12 @@ public class Organization {
 	private String description;
 	private String logo;
 	private List<User> users;
-	private List<String> resources;
+	private List<VirtualMachine> resources;
 
 	public Organization() {
 	}
 
-	public Organization(String name, String description, String logo, List<User> users, List<String> resources) {
+	public Organization(String name, String description, String logo, List<User> users, List<VirtualMachine> resources) {
 		super();
 		this.name = name;
 		this.description = description;
@@ -29,7 +29,7 @@ public class Organization {
 		this.description = description;
 		this.logo = logo;
 		this.users = new ArrayList<User>();
-		this.resources = new ArrayList<>();
+		this.resources = new ArrayList<VirtualMachine>();
 	}
 
 	public String getName() {
@@ -64,11 +64,11 @@ public class Organization {
 		this.users = users;
 	}
 
-	public List<String> getResources() {
+	public List<VirtualMachine> getResources() {
 		return resources;
 	}
 
-	public void setResources(List<String> resources) {
+	public void setResources(List<VirtualMachine> resources) {
 		this.resources = resources;
 	}
 

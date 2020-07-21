@@ -1,18 +1,1 @@
-[
-	{
-		"email": "vukbarisic1996@gmail.com",
-		"password": "1",
-		"firstName": "Rack",
-		"lastName": "jackson",
-		"organisation": "mega",
-		"role": "admin"
-	},
-	{
-		"email": "man",
-		"password": "1",
-		"firstName": "Rack",
-		"lastName": "jackson",
-		"organisation": "",
-		"role": "superadmin"
-	}
-]
+[{"email":"vukbarisic1996@gmail.com","password":"1","firstName":"Rack","lastName":"jackson","organization":"","role":"superadmin"},{"email":"v@gmail.com","password":"2","firstName":"Vuk","lastName":"Barisic","organization":"","role":"superadmin"},{"email":"alexbarisic@gmail.com","password":"1","firstName":"Aleksandra","lastName":"Barisic","organization":"Apple incorporated","role":"user"}]

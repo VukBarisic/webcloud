@@ -17,9 +17,12 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.sun.tracing.dtrace.ProviderAttributes;
+
 import helpers.HelperMethods;
 import model.User;
-import repository.Repository;
+import repository.OrganizationRepository;
+import repository.UserRepository;
 
 @Path("/users")
 public class UserService {
@@ -36,7 +39,7 @@ public class UserService {
 	@PostConstruct
 	public void init() {
 		if (ctx.getAttribute("users") == null) {
-			ctx.setAttribute("users", Repository.getUsers());
+			ctx.setAttribute("users", UserRepository.getUsers());
 		}
 	}
 
@@ -45,7 +48,7 @@ public class UserService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response login(HashMap<String, String> data) {
-		User user = Repository.login(data.get("email"), data.get("password"));
+		User user = UserRepository.login(data.get("email"), data.get("password"));
 		if (user == null) {
 			return Response.status(400).entity("Invalid username and/or password").build();
 		}
@@ -85,11 +88,11 @@ public class UserService {
 		String password = data.get("password");
 		String firstName = data.get("firstName");
 		String lastName = data.get("lastName");
-		String organisation = data.get("organisation");
+		String organization = data.get("organization");
 		String role = data.get("role");
-		User user = new User(email, password, firstName, lastName, organisation, role);
+		User user = new User(email, password, firstName, lastName, organization, role);
 
-		return Repository.saveUser(user);
+		return UserRepository.saveUser(user);
 
 	}
 	
@@ -102,6 +105,27 @@ public class UserService {
 
 		return Response.status(200).entity(HelperMethods.GetJsonValue("success")).build();
 
+	}
+	
+	@GET
+	@Path("/getAll")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response findAll() {
+		return Response.status(200).entity(UserRepository.getUsers()).build();
+	}
+	
+	@POST
+	@Path("/delete")
+	@Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+	public Response delete(HashMap<String, String> data)
+	{
+		String email = data.get("email");
+		if (UserRepository.deleteUser(email)) {
+			return Response.status(200).entity(UserRepository.getUsers()).build();
+		}
+		
+		return Response.status(400).entity(HelperMethods.GetJsonValue("error")).build();
 	}
 	
 

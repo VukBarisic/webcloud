@@ -1,15 +1,68 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class VirtualMachine {
-	//unique
+	// unique
 	private String name;
-	//mandatory
-	private Organization organization;
-	//mandatory
+	// mandatory
+	private String organization;
+	// mandatory
 	private VMcategory vMcategory;
 	private List<Activity> activities;
-	
+	private List<Disk> disks;
+
+	public VirtualMachine() {
+
+	}
+
+	public VirtualMachine(String name, String organization, VMcategory vMcategory) {
+		this.name = name;
+		this.organization = organization;
+		this.vMcategory = vMcategory;
+		this.activities = new ArrayList<Activity>();
+		this.disks = new ArrayList<Disk>();
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getOrganization() {
+		return organization;
+	}
+
+	public void setOrganization(String organization) {
+		this.organization = organization;
+	}
+
+	public VMcategory getvMcategory() {
+		return vMcategory;
+	}
+
+	public void setvMcategory(VMcategory vMcategory) {
+		this.vMcategory = vMcategory;
+	}
+
+	public List<Disk> getDisks() {
+		return disks;
+	}
+
+	public void setDisks(List<Disk> disks) {
+		this.disks = disks;
+	}
+	public List<Activity> getActivities() {
+		return activities;
+	}
+
+	public void setActivities(List<Activity> activities) {
+		this.activities = activities;
+	}
+
 
 }

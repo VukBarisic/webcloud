@@ -1,0 +1,50 @@
+<div class="container">
+	<div class="row justify-content-center">
+		<div class="col-md-6">
+			<form>
+				<div class="form-group">
+					<label>Name </label> <input type="text" class="form-control"
+						id="name" placeholder=""> <small
+						class="form-text text-muted" hidden="">Name can't be empty</small>
+				</div>
+				
+				<!-- form-group end.// -->
+				<div class="form-row">
+					<div class="form-group col-md-6">
+						<label>Organization</label> <select id="selectOrganization"
+							class="form-control">
+							<option>Choose...</option>
+						</select>
+					</div>
+					<div class="form-group col-md-6">
+						<label>Virtual machine</label> <select id="selectVM"
+							class="form-control">
+							<option>Choose...</option>
+						</select>
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<label>Capacity(GB)</label> <input type="number" class="form-control"
+						id="capacity" placeholder="">
+				</div>
+				<div class="form-group">
+					<label class="form-check form-check-inline"> <input
+						class="form-check-input" type="radio" name="diskType" value="HDD">
+						<span class="form-check-label"> HDD </span>
+					</label> <label class="form-check form-check-inline"> <input
+						class="form-check-input" type="radio" name="diskType" value="SSD">
+						<span class="form-check-label"> SSD</span>
+					</label>
+				</div>
+
+				<div class="form-group">
+					<button type="button" id="button_add_disk"
+						class="btn btn-primary btn-block">Add disk</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+
+</div>

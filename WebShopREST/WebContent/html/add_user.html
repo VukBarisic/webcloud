@@ -1,0 +1,92 @@
+<!--<form>
+	<div class="col-md-4 mb-3">
+		<label for="email">Email</label> <input type="text"
+			class="form-control" id="email" placeholder="Email" required>
+		<div class="invalid-feedback">Email can't be empty</div>
+	</div>
+	<div class="col-md-4 mb-3">
+		<label for="firstName">First name</label> <input type="text"
+			class="form-control" id="firstName" placeholder="First name" required>
+		<div class="invalid-feedback">First name can't be empty</div>
+	</div>
+	<div class="col-md-4 mb-3">
+		<label for="lastName">Last name</label> <input type="text"
+			class="form-control" id="lastName" placeholder="Last name" required>
+		<div class="invalid-feedback">Last name can't be empty</div>
+	</div>
+	<div class="col-md-4 mb-3">
+		<label for="selectOrganization">Select organization</label> <select
+			id="selectOrganization">
+			<option>Choose organization</option>
+		</select>
+		<div class="invalid-feedback">Field can't be empty</div>
+	</div>
+	<div class="col-md-4 mb-3">
+		<label for="selectUserType">Select user type</label> <select
+			id="selectUserType">
+			<option>Choose user type</option>
+			<option>user</option>
+			<option>admin</option>
+		</select>
+		<div class="invalid-feedback">Field can't be empty</div>
+	</div>
+	<div class="col-md-4 mb-3">
+		<label for="password">Password</label> <input type="password"
+			class="form-control" id="password" placeholder="password" required>
+		<div class="invalid-feedback">Password can't be empty</div>
+	</div>
+</form>-->
+
+<div class="container">
+
+<div class="row justify-content-center">
+<div class="col-md-6">
+<form>
+	<div class="form-row">
+		<div class="col form-group">
+			<label>First name </label>   
+		  	<input type="text" class="form-control" id="firstName" placeholder="">
+		  	<small class="form-text text-muted" hidden = "">Name cant be empty</small>
+		</div>
+		<div class="col form-group">
+			<label>Last name</label>
+		  	<input type="text" class="form-control"  id="lastName"placeholder=" ">
+		</div> <!-- form-group end.// -->
+	</div> <!-- form-row end.// -->
+	<div class="form-group">
+		<label>Email address</label>
+		<input type="email" class="form-control" id="email" placeholder="">
+		<small class="form-text text-muted">We'll never share your email with anyone else.</small>
+	</div> <!-- form-group end.// -->
+	<div class="form-group">
+			<label class="form-check form-check-inline">
+		  <input class="form-check-input" type="radio" name = "userType" value="user">
+		  <span class="form-check-label"> User </span>
+		</label>
+		<label class="form-check form-check-inline">
+		  <input class="form-check-input" type="radio" name = "userType" value="admin">
+		  <span class="form-check-label"> Admin</span>
+		</label>
+	</div> <!-- form-group end.// -->
+	<div class="form-row">
+		<div class="form-group col-md-6">
+		  <label>Organization</label>
+		  <select id="selectOrganization" class="form-control">
+		    <option> Choose...</option>
+		  </select>
+		</div> <!-- form-group end.// -->
+	</div> <!-- form-row.// -->
+	<div class="form-group">
+		<label>Create password</label>
+	    <input class="form-control" type="password" id = "password">
+	</div> <!-- form-group end.// -->  
+    <div class="form-group">
+        <button type="button"  id="button_add_user" class="btn btn-primary btn-block"> Add user</button>
+    </div> <!-- form-group// -->      
+</form>
+</div> 
+
+</div>
+
+
+</div> 

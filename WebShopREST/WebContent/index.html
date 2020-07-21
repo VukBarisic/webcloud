@@ -9,12 +9,20 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" ></script>
     <script src="js/jquery-3.5.1.js"></script>
+    <script type="text/javascript" src="js/popper.js"></script>
+	<script type="text/javascript" src="js/popper.min.js"></script>
 	<script type="text/javascript" src="js/toastr.js"></script>
 	<script type="text/javascript" src="js/toastr.min.js"></script>
 	<script src="js/home_page.js"></script>
 	<title>VMs</title>
 </head>
 <body>
+<script type="text/javascript">
+    $(document).on("click", "ul li", function () {
+        $('#navbarSupportedContent li').removeClass('active');
+        $(this).addClass("active");
+    })
+</script>
 <nav id = "index_nav" class="navbar navbar-expand-lg navbar-fixed-top navbar-dark bg-dark">
   <a class="navbar-brand">WebCloud</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -24,25 +32,23 @@
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item active">
-        <a class="nav-link" id = "home">Home <span class="sr-only">(current)</span></a>
+        <a class="nav-link" id = "home">Virtual Machines <span class="sr-only">(current)</span></a>
       </li>
       <li class="nav-item">
         <a class="nav-link" id="organizations">Organizations</a>
       </li>
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Dropdown
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <a class="dropdown-item" >Action</a>
-          <a class="dropdown-item">Another action</a>
-          <div class="dropdown-divider"></div>
-          <a class="dropdown-item" >Something else here</a>
-        </div>
+       <li class="nav-item">
+        <a class="nav-link" id="users">Users</a>
+      </li>
+       <li class="nav-item">
+        <a class="nav-link" id="vmCategories">VmCategories</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="disks">Disks</a>
       </li>
     </ul>
     <form class="form-inline my-2 my-lg-0">
-      <input class="form-control mr-sm-2" type="search" placeholder="Search"  id = "search-input" aria-label="Search">
+      <input class="form-control mr-sm-2" type="text" placeholder="Search"  id = "search-input" aria-label="Search">
       <button class="btn btn-outline-success my-2 my-sm-0"  id = "search-button" type="button">Search</button>
     </form>
     <div align = "right">
