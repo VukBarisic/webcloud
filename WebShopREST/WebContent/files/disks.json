@@ -1,9 +1,1 @@
-[
-	{
-		"name": "disk",
-		"organization": "Apple incorporated",
-		"diskType": "HDD",
-		"capacity": 256,
-		"virtualMachine": "M90"
-	}
-]
+[{"name":"disk0","organization":"Apple incorporated","diskType":"HDD","capacity":512,"virtualMachine":"M90"},{"name":"disk2","organization":"amazon incorp","diskType":"HDD","capacity":250,"virtualMachine":""},{"name":"disk3","organization":"Apple incorporated","diskType":"HDD","capacity":245,"virtualMachine":"M90x"}]

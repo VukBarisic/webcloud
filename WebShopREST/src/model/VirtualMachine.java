@@ -11,7 +11,7 @@ public class VirtualMachine {
 	// mandatory
 	private VMcategory vMcategory;
 	private List<Activity> activities;
-	private List<Disk> disks;
+	private List<String> disks;
 
 	public VirtualMachine() {
 
@@ -22,7 +22,7 @@ public class VirtualMachine {
 		this.organization = organization;
 		this.vMcategory = vMcategory;
 		this.activities = new ArrayList<Activity>();
-		this.disks = new ArrayList<Disk>();
+		this.disks = new ArrayList<String>();
 	}
 
 	public String getName() {
@@ -49,11 +49,11 @@ public class VirtualMachine {
 		this.vMcategory = vMcategory;
 	}
 
-	public List<Disk> getDisks() {
+	public List<String> getDisks() {
 		return disks;
 	}
 
-	public void setDisks(List<Disk> disks) {
+	public void setDisks(List<String> disks) {
 		this.disks = disks;
 	}
 	public List<Activity> getActivities() {

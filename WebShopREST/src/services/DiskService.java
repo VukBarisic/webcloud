@@ -84,4 +84,20 @@ public class DiskService {
 		return Response.status(200).entity(disk).build();
 
 	}
+	
+	@POST
+	@Path("/update")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response updateDisk(HashMap<String, String> data) {
+		if (!data.get("oldName").equals(data.get("name")) && !DiskRepository.isUniqueDisk(data.get("name"))) {
+			return Response.status(200).entity("existError").build();
+		}
+		boolean success = DiskRepository.updateDisk(data);
+		if (!success) {
+			return Response.status(400).entity("Error updating disk").build();
+		}
+		return Response.status(200).entity(HelperMethods.GetJsonValue(success)).build();
+
+	}
 }

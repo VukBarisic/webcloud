@@ -9,13 +9,13 @@ public class Organization {
 	private String name;
 	private String description;
 	private String logo;
-	private List<User> users;
-	private List<VirtualMachine> resources;
+	private List<String> users;
+	private List<String> resources;
 
 	public Organization() {
 	}
 
-	public Organization(String name, String description, String logo, List<User> users, List<VirtualMachine> resources) {
+	public Organization(String name, String description, String logo, List<String> users, List<String> resources) {
 		super();
 		this.name = name;
 		this.description = description;
@@ -28,8 +28,8 @@ public class Organization {
 		this.name = name;
 		this.description = description;
 		this.logo = logo;
-		this.users = new ArrayList<User>();
-		this.resources = new ArrayList<VirtualMachine>();
+		this.users = new ArrayList<String>();
+		this.resources = new ArrayList<String>();
 	}
 
 	public String getName() {
@@ -56,19 +56,19 @@ public class Organization {
 		this.logo = logo;
 	}
 
-	public List<User> getUsers() {
+	public List<String> getUsers() {
 		return users;
 	}
 
-	public void setUsers(List<User> users) {
+	public void setUsers(List<String> users) {
 		this.users = users;
 	}
 
-	public List<VirtualMachine> getResources() {
+	public List<String> getResources() {
 		return resources;
 	}
 
-	public void setResources(List<VirtualMachine> resources) {
+	public void setResources(List<String> resources) {
 		this.resources = resources;
 	}
 

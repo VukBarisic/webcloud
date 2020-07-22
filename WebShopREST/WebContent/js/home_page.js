@@ -1,5 +1,6 @@
 
 var loggedUser = null;
+var oldName = "";
 
 $(document).ready(function() {
 	loadHomePage();
@@ -891,15 +892,16 @@ $(document).on("change", "#selectOrganization", function(){
 			if (len>0){
 				$( "#selectVM" ).prop( "disabled", false );
 				$('#selectVM').append("<option value='"+ "" +"'>Select value</option>");
+				for( var i = 0; i<len; i++){
+		               var vm = vms[i].split(".")[0];
+		               $('#selectVM').append("<option value='"+vm+"'>"+vm+"</option>");
+		           }
 			}
 			else {
 				$( "#selectVM" ).prop( "disabled", true );
 				$('#selectVM').append("<option value='"+ "" +"'>Not available</option>");
 			}
-            for( var i = 0; i<len; i++){
-                var vm = vms[i].split(".")[0];
-                $('#selectVM').append("<option value='"+vm+"'>"+vm+"</option>");
-            }
+           
 		},
 		error : function(errorThrown) {
 			toastr.error(errorThrown);
@@ -915,7 +917,7 @@ function addDisk() {
 	obj["name"] = $("#name").val();
 	obj["diskType"] = $('input[name="diskType"]:checked').val();
 	obj["capacity"] = $("#capacity").val();
-	obj["virtualMachine"] = $("#selectVM").val();
+	obj["virtualMachine"] = $("#selectVM").val() + "." + $('#selectOrganization').val();
 	obj["organization"] = $('#selectOrganization').val();
 
 	
@@ -973,7 +975,8 @@ function loadEditDisk() {
 	var name = splitted[1];
 	var obj = {};
 	obj["name"] = name;
-	$("#div_center").load("html/add_disk.html", function() {
+	oldName = name;
+	$("#div_center").load("html/edit_disk.html", function() {
 		
 		$.post({
 			url : 'rest/disks/getByName',
@@ -988,20 +991,88 @@ function loadEditDisk() {
 			}
 	
 	});
-		$("#add_disk").on("click", editDisk());
+		$("#button_edit_disk").on("click", editDisk);
 		
 	});
 }
 
 function fillEditFieldsDisk(disk) {
-	$("#disk_name").val(disk.name);
-	$("#add_disk").html("update")
+	$("#name").val(disk.name);
+	$("#capacity").val(disk.capacity);
+	$("input[name=diskType][value="+ disk.diskType+ "]").prop("checked",true);
+	$("#organization").val(disk.organization);
+	$("#organization").prop( "disabled", true);
+	$("#button_edit_disk").html("Update disk")
+	var obj = {};
+	obj["organization"] = disk.organization;
+	$.post({
+		url : 'rest/vms/getByCompany',
+		contentType : 'application/json',
+		dataType : 'json',
+		data : JSON.stringify(obj),
+		success : function(vms) {
+			var len = vms.length;
+			$("#selectVM").empty();
+			if (len>0){
+				$( "#selectVM" ).prop( "disabled", false );
+				for( var i = 0; i<len; i++){
+	                var vm = vms[i].split(".")[0];
+	                $('#selectVM').append("<option value='"+vm+"'>"+vm+"</option>");
+	            }
+			}
+			else {
+				$("#selectVM" ).prop( "disabled", true );
+				$('#selectVM').append("<option value='"+ "" +"'>Not available</option>");
+			}
+            
+		},
+		error : function(errorThrown) {
+			toastr.error(errorThrown);
+		}
+});
+	if (disk.virtualMachine == "") {
+		$("#selectVM").val("not selected").change();
+	}
+	else {
+		$("#selectVM").val(disk.virtualMachine).change();
+	}
+	
 
 	
 }
 
 function editDisk() {
+	var obj = {};
+	obj["oldName"] = oldName;
+	obj["name"] = $("#name").val();
+	obj["diskType"] = $('input[name="diskType"]:checked').val();
+	obj["capacity"] = $("#capacity").val();
+	obj["virtualMachine"] = $("#selectVM").val();
+	obj["organization"] = $('#organization').val();
 
+	
+	$.ajax({
+		async: false,
+		type: 'POST',
+		url : "rest/disks/update",
+		contentType : 'application/json',
+		dataType : 'json',
+		data : JSON.stringify(obj),
+		success : function(data) {
+			if(data == "existError")
+			{
+				toastr.error("Disk name already exists!");
+			}
+			else (data == "success")
+			{
+				toastr.success("You've successfully updated disk!");
+        		getDisks(); 
+			}
+		},
+		error: function(errorThrown ){
+			toastr.error( errorThrown );
+		}
+	});
 	
 }
 

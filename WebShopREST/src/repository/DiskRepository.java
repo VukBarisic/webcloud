@@ -74,26 +74,11 @@ public class DiskRepository {
 			if (!data.get("virtualMachine").equals("")) {
 				for (VirtualMachine vm : virtualMachines) {
 					if (vm.getName().split("\\.")[0].equals(data.get("virtualMachine"))) {
-						vm.getDisks().add(disk);
+						vm.getDisks().add(disk.getName());
 						mapper.writeValue(Paths.get(
 								"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\virtualmachines.json")
 								.toFile(), virtualMachines);
 					}
-				}
-				for (Organization org : organizations) {
-					if (org.getName().equals(data.get("organization"))) {
-						for (VirtualMachine vm : org.getResources()) {
-							if (vm.getName().split("\\.")[0].equals(data.get("virtualMachine"))) {
-								vm.getDisks().add(disk);
-								mapper.writeValue(Paths.get(
-										"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\organizations.json")
-										.toFile(), organizations);
-								break;
-							}
-
-						}
-					}
-					break;
 				}
 
 			}
@@ -128,6 +113,47 @@ public class DiskRepository {
 		List<Disk> disks = getDisks().stream().filter(disk -> disk.getName().toLowerCase().contains(name.toLowerCase()))
 				.collect(Collectors.toList());
 		return disks;
+	}
+
+	public static boolean updateDisk(HashMap<String, String> data) {
+		try {
+			ArrayList<VirtualMachine> virtualMachines = VmRepository.getVirtualMachines();
+			ArrayList<Disk> disks = getDisks();
+			int capacity = Integer.parseInt(data.get("capacity"));
+			for (Disk d : disks) {
+				if (d.getName().equals(data.get("oldName"))) {
+					d.setCapacity(capacity);
+					d.setName(data.get("name"));
+					d.setVirtualMachine(data.get("virtualMachine"));
+					if (data.get("diskType").equals("HDD"))
+						d.setDiskType(DiskType.HDD);
+					else
+						d.setDiskType(DiskType.SSD);
+					if (!data.get("oldName").equals(data.get("name"))) {
+						VmRepository.diskUpdated(data.get("oldName"), d);
+					}
+				}
+			}
+			/*
+			 * if (!data.get("oldName").equals(data.get("name"))) { for (VirtualMachine vm :
+			 * virtualMachines) { if (vm.getName().equals(data.get("virtualMachine"))) { int
+			 * index = vm.getDisks().indexOf(data.get("oldName")); vm.getDisks().set(index,
+			 * data.get("name")); mapper.writeValue(Paths.get(
+			 * "C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\virtualmachines.json")
+			 * .toFile(), virtualMachines); }
+			 * 
+			 * } }
+			 */
+
+			mapper.writeValue(Paths.get(
+					"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\disks.json")
+					.toFile(), disks);
+			return true;
+		} catch (IOException e) {
+
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 }
