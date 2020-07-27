@@ -1,20 +1,54 @@
+<style>
+#load_add_disk {
+	position: absolute;
+	left: 300px;
+}
+label {
+	position: absolute;
+	left: 300px;
+}
+</style>
 <div>
-<p>Disks</p>
-<table class="table table-striped" id="disks_table">
-	<thead>
-		<tr>
-			<th>Name</th>
-			<th>Type</th>
-			<th>Capacity</th>
-			<th>Organization</th>
-			<th>Buttons</th>
-		</tr>
-	</thead>
-	<tbody>
+	<div class="container">
+		<div class="row justify-content-center">
+			<form>
+			<label>Capacity</label>
+				<div class="form-row">
+					<div class="col form-group">
+						<input type="number" onkeypress="return validateNumber(event);"
+							class="form-control" min="0" placeholder="from.."
+							autocomplete="off" />
+					</div>
+					<div class="col form-group">
+						<input type="number" onkeypress="return validateNumber(event);"
+							class="form-control" min="0" placeholder="to" autocomplete="off" />
+					</div>
 
-	</tbody>
-</table>
-<button id="load_add_disk" class="btn btn-primary"
+					<div class="col form-group">
+						<button type="button" id="filter_disks" class="btn btn-primary">Filter</button>
+					</div>
+				</div>
+			</form>
+		</div>
+
+	</div>
+	<p>Disks</p>
+	<table class="table table-striped" id="disks_table">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Type</th>
+				<th>Capacity</th>
+				<th>Organization</th>
+				<th>VM</th>
+				<th>Buttons</th>
+			</tr>
+		</thead>
+		<tbody>
+
+		</tbody>
+	</table>
+	<button id="load_add_disk" class="btn btn-primary"
 		onclick="loadAddDisk()">Add disk</button>
 
 </div>

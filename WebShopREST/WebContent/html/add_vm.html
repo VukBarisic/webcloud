@@ -1,41 +1,61 @@
-<form class="needs-validation" novalidate>
-	<div class="col-md-4 mb-3">
-		<label for="vmname">VM name</label> <input type="text"
-			class="form-control" id="vmname" placeholder="First name" required>
-		<div class="invalid-feedback">Name can't be empty</div>
-	</div>
-	<div class="col-md-4 mb-3">
-		<label for="selectCategory">Select category</label> <select
-			id="selectCategory">
-			<option>Choose category</option>
-		</select>
-		<div class="invalid-feedback">Field can't be empty</div>
-	</div>
-	<div class="col-md-4 mb-3">
-		<label for="selectOrganization">Select organization</label> <select
-			id="selectOrganization">
-			<option>Choose organization</option>
-		</select>
-		<div class="invalid-feedback">Field can't be empty</div>
-	</div>
-	<div class="row">
-		<div class="col-md-4 mb-3">
-			<label for="numofcores">Number of cores</label> <input type="number"
-				class="form-control" id="numOfCores" placeholder="number of cores"
-				disabled>
-		</div>
-		<div class="col-md-4 mb-3">
-			<label for="ram">Ram</label> <input type="number"
-				class="form-control" id="ram" placeholder="ram"
-				aria-describedby="inputGroupPrepend" disabled>
-		</div>
-		<div class="col-md-4 mb-3">
-			<label for="gpu">Gpu</label> <input type="number"
-				class="form-control" id="gpu" placeholder="number of gpu cores"
-				disabled>
-		</div>
-	</div>
+<style>
+#add_vm {
+	position: absolute;
+	left: 100px;
+}
+</style>
 
-	<button id="add_vm" class="btn btn-primary" type="button">Add
-		VM</button>
-</form>
+<div class="container">
+
+	<div class="row justify-content-center">
+		<div class="col-md-6">
+			<form class="needs-validation" novalidate>
+				<div class="form-group">
+					<label for="vmname">VM name</label> <input type="text"
+						class="form-control" id="vmname" placeholder="First name" required>
+					<p><small id="validationName"
+							class="form-text text-muted">Field can't be empty</small></p>
+				</div>
+				<div class="row">
+				<div class="form-group col-md-6">
+					<label for="selectCategory">Select category</label> <select
+						id="selectCategory" class = "form-control">
+						<option>Choose category</option>
+					</select>
+					<p><small id="validationCat"
+							class="form-text text-muted">Field can't be empty</small></p>
+				</div>
+				<div class="form-group col-md-6">
+					<label for="selectOrganization">Select organization</label> <select
+						id="selectOrganization" class = "form-control">
+						<option>Choose organization</option>
+					</select>
+					<p><small id="validationOrg"
+							class="form-text text-muted">Field can't be empty</small></p>
+				</div>
+				</div>
+				<div class="row">
+					<div class="col form-group">
+						<label for="numofcores">Cores</label> <input
+							type="number" class="form-control" id="numOfCores"
+							placeholder="number of cores" disabled>
+					</div>
+					<div class="col form-group">
+						<label for="ram">Ram</label> <input type="number"
+							class="form-control" id="ram" placeholder="ram"
+							aria-describedby="inputGroupPrepend" disabled>
+					</div>
+					<div class="col form-group">
+						<label for="gpu">Gpu</label> <input type="number"
+							class="form-control" id="gpu" placeholder="number of gpu cores"
+							disabled>
+					</div>
+				</div>
+				<div class="form-group">
+					<button id="add_vm" class="btn btn-primary" type="button">Add
+						virtual machine</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>

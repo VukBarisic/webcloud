@@ -1,6 +1,8 @@
 
 var loggedUser = null;
 var oldName = "";
+var searchResults = [];
+var filterResults = [];
 
 $(document).ready(function() {
 	loadHomePage();
@@ -10,14 +12,13 @@ function loadHomePage() {
 	loggedUser = getLoggedUser();
 	if (loggedUser == null) {
 		$("#index_nav").hide();
-		// document.body.style.background = "#808080";
 		loadLoginPage();
 	} else {
 		$("#index_nav").show();
 		getVirtualMachines();
 		var x = document.getElementById("loggedUserDrop");
 		x.innerHTML = loggedUser.email;
-		$("#button_login").unbind().on("click", login);
+		$("#button_login").on("click", login);
 		$("#home").on("click", getVirtualMachines);
 		$("#organizations").on("click", getOrganizations);
 		$("#users").on("click", getUsers);
@@ -33,7 +34,7 @@ function loadHomePage() {
 
 function loadLoginPage() {
 	$("#div_center").load("html/login.html", function() {
-		$("#button_login").unbind().on("click", login);
+		$("#button_login").on("click", login);
 	});
 
 }
@@ -140,7 +141,6 @@ function getOrganizations() {
 }
 
 function showOrganizations(organizations) {
-	
 	if (organizations.length > 0) {
 		$("#div_center").load("html/organizations.html", function() {
 			for (let organization of organizations) {
@@ -151,8 +151,8 @@ function showOrganizations(organizations) {
 	else {
 		$("#div_center").load("html/no_organizations.html");
 	}
-	$("#search-button").on("click", searchOrganizations);
-	$("#add_organization").on("click", loadAddOrganization);
+	$("#search-button").off().on("click", searchOrganizations);
+	$("#add_organization").off().on("click", loadAddOrganization);
 }
 
 
@@ -164,7 +164,7 @@ function addOrganizationTr(organization){
 	let tdIme = $('<td>' + organization.name + '</td>');
 	var buttonDelId = "del_" + organization.name;
 	var buttonEditId = "edit_" + organization.name;
-	let tdButtons = $('<td><button type="button" id = "' + buttonEditId + '" data-toggle="modal" class="btn btn-warning btn-rounded btn-sm my-0">Edit</button><button type="button" id = "' + buttonDelId + '" class="btn btn-danger btn-rounded btn-sm my-0">Delete</button></td>');
+	let tdButtons = $('<td><button type="button" id = "' + buttonEditId + '" data-toggle="modal" class="btn btn-warning btn-rounded btn-sm my-0">Update</button><button type="button" id = "' + buttonDelId + '" class="btn btn-danger btn-rounded btn-sm my-0">Delete</button></td>');
 
 	tr.append(tdLogo).append(tdBroj).append(tdIme).append(tdButtons);
 	$('#organizationsTable tbody').append(tr);
@@ -312,10 +312,13 @@ function searchOrganizations() {
 }
 
 function getVirtualMachines() {
+	searchResults = [];
+	filterResults = [];
 	$.get({
 		url : 'rest/vms/getAll',
 		dataType : 'json',
 		success : function(vms) {
+	
 			showVirtualMachines(vms);
 		},
 		error : function(errorThrown) {
@@ -335,7 +338,8 @@ function showVirtualMachines(virtualMachines){
 	else {
 		$("#div_center").load("html/no_vms.html");
 	}
-	$("#search-button").on("click", searchVirtualMachines);
+	$("#search-button").off().on("click", searchVirtualMachines);
+	$("#filter_vm").off().on("click", filterVM);
 	$("#add_vm").on("click", loadAddOrganization);
 }
 
@@ -348,10 +352,10 @@ function addVirtualMachineTr(virtualMachine){
 	let organization = $('<td>' + virtualMachine.organization + '</td>');
 	var buttonDelId = "del_" + virtualMachine.name;
 	var buttonEditId = "edit_" + virtualMachine.name;
-	let tdButtons = $('<td><button type="button" id = "' + buttonEditId + '" data-toggle="modal" class="btn btn-warning btn-rounded btn-sm my-0">Edit</button><button type="button" id = "' + buttonDelId + '" class="btn btn-danger btn-rounded btn-sm my-0">Delete</button></td>');
+	let tdButtons = $('<td><button type="button" id = "' + buttonEditId + '" data-toggle="modal" class="btn btn-warning btn-rounded btn-sm my-0">Update</button><button type="button" id = "' + buttonDelId + '" class="btn btn-danger btn-rounded btn-sm my-0">Delete</button></td>');
 
 	tr.append(tdName).append(tdCores).append(tdRam).append(tdGpuCores).append(organization).append(tdButtons);
-	$('#vms_table tbody').append(tr);
+	$('#vmTable tbody').append(tr);
 	document.getElementById(buttonEditId).addEventListener("click", editVm);
 	document.getElementById(buttonDelId).addEventListener("click", deleteVm);
 
@@ -359,6 +363,7 @@ function addVirtualMachineTr(virtualMachine){
 }
 
 function loadAddVm() {
+	
 	$("#div_center").load("html/add_vm.html", function() {
 		$("#add_vm").on("click", addVirtualMachine);
 		var options = [];
@@ -419,6 +424,42 @@ function addVirtualMachine() {
 	obj["organization"] = $("#selectOrganization").val();
 	obj["category"] = $('#selectCategory').val();
 	
+	let validate = true;
+	
+	if (obj["name"] == "") {
+		 $("#validationName").show();
+		 $("#vmname").css("border-color","red");
+		 validate = false;
+	}
+	else{
+		$("#validationName").hide();
+		$("#vmname").css("border-color","#ced4da");
+	}
+	if (obj["organization"] == "") {
+		 $("#validationOrg").show();
+		 $("#selectOrganization").css("border-color","red");
+		 validate = false;
+	}
+	else {
+		$("#validationOrg").hide();
+		$("#selectOrganization").css("border-color","#ced4da");
+	}
+	if (obj["category"] == "") {
+		 $("#validationCat").show();
+		 $("#selectCategory").css("border-color","red");
+		 validate = false;
+	}
+	else {
+		$("#validationCat").hide();
+		$("#selectCategory").css("border-color","#ced4da");
+	}
+
+	if (!validate) {
+		toastr.error("All fields must be filled!");
+		return false;
+	}
+
+	
 	$.ajax({
 		async: false,
 		type: 'POST',
@@ -471,8 +512,96 @@ function deleteVm(){var button_id = this.id;
 }
 
 function searchVirtualMachines(){
+	var obj = {};
+	obj["name"] = $("#search-input").val();
+	if (obj["name"] == "") {
+		toastr.error("Search input can't be empty");
+		return false;
+	}
+	$.ajax({
+		url : 'rest/vms/search',
+		type : 'POST',
+		contentType : 'application/json',
+		dataType : 'json',
+		data : JSON.stringify(obj),
+		success : function(vms) {
+			searchResults = vms;
+			if (filterResults.length > 0) {
+				showVirtualMachines(filterSearchIntersection(searchResults, filterResults));
+			}
+			else {
+				showVirtualMachines(vms);
+			}
+		},
+		error : function(errorThrown) {
+			toastr.error(errorThrown);
+		}
+	});
+	}
+
+function filterVM(){
+	var obj = {};
+	obj["ramFrom"] = $("#ramFrom").val();
+	obj["ramTo"] = $("#ramTo").val();
+	obj["gpuFrom"] = $("#gpuFrom").val();
+	obj["gpuTo"] = $("#gpuTo").val();
+	obj["coresFrom"] = $("#coresFrom").val();
+	obj["coresTo"] = $("#coresTo").val();
 	
-}
+	//validation
+	if ((obj["ramFrom"] == "" && obj["ramTo"] != "") || (obj["ramFrom"] != "" && obj["ramTo"] == "") )  {
+		toastr.error("One ram filter field is filled");
+		return false;
+	}
+	if ((obj["gpuFrom"] == "" && obj["gpuTo"] != "") || (obj["gpuFrom"] != "" && obj["gpuTo"] == "") )  {
+		toastr.error("One gpu filter field is filled");
+		return false;
+	}
+	if ((obj["coresFrom"] == "" && obj["coresTo"] != "") || (obj["coresFrom"] != "" && obj["coresTo"] == "") )  {
+		toastr.error("One core filter field is filled");
+		return false;
+	}
+	if (obj["ramFrom"] == "" && obj["gpuFrom"] == "" && obj["coresFrom"] == "") {
+		toastr.error("All fields are empty");
+		return false;
+	}
+	if (parseInt(obj["ramFrom"]) >= parseInt(obj["ramTo"])) {
+		toastr.error("Right field number has to be bigger than left");
+		return false;
+	}
+	if (parseInt(obj["gpuFrom"]) >= parseInt(obj["gpuTo"])) {
+		toastr.error("Right field number has to be bigger than left");
+		return false;
+	}
+	if (parseInt(obj["coresFrom"]) >= parseInt(obj["coresTo"])) {
+		toastr.error("Right field number has to be bigger than left");
+		return false;
+	}
+	
+	//end of validation
+	
+	
+	$.ajax({
+		url : 'rest/vms/filter',
+		type : 'POST',
+		contentType : 'application/json',
+		dataType : 'json',
+		data : JSON.stringify(obj),
+		success : function(vms) {
+			filterResults = vms;
+			if (searchResults.length > 0) {
+				showVirtualMachines(filterSearchIntersection(searchResults, filterResults));
+			}
+			else {
+				showVirtualMachines(vms);
+			}
+		},
+		error : function(errorThrown) {
+			toastr.error(errorThrown);
+		}
+	});
+	}
+
 
 function getUsers() {
 	$.get({
@@ -488,7 +617,6 @@ function getUsers() {
 }
 
 function showUsers(users) {
-	
 	if (users.length > 0) {
 		$("#div_center").load("html/users.html", function() {
 			for (let user of users) {
@@ -524,7 +652,7 @@ function addUserTr(user){
 	else{
 		var buttonDelId = "deluser_" + user.email;
 		var buttonEditId = "edituser_" + user.email;
-		let tdButtons = $('<td><button type="button" id = "' + buttonEditId + '" data-toggle="modal" class="btn btn-warning btn-rounded btn-sm my-0">Edit</button><button type="button" id = "' + buttonDelId + '" class="btn btn-danger btn-rounded btn-sm my-0">Delete</button></td>');
+		let tdButtons = $('<td><button type="button" id = "' + buttonEditId + '" data-toggle="modal" class="btn btn-warning btn-rounded btn-sm my-0">Update</button><button type="button" id = "' + buttonDelId + '" class="btn btn-danger btn-rounded btn-sm my-0">Delete</button></td>');
 		tr.append(tdEmail).append(tdFirstName).append(tdLastName).append(tdOrg).append(tdButtons);
 		$('#usersTable tbody').append(tr);
 		document.getElementById(buttonEditId).addEventListener("click", editUser);
@@ -532,13 +660,15 @@ function addUserTr(user){
 	}
 	}
 	
-	
-	
-	
-
 function loadAddUser() {
 	$("#div_center").load("html/add_user.html", function() {
 		$("#button_add_user").on("click", addUser);
+		$("#validationFirst").hide();
+		$("#validationLast").hide();
+		$("#validationEmail").hide();
+		$("#validationPass").hide();
+		$("#validationRole").hide();
+		$("#validationOrg").hide();
 		var options = [];
 		$.get({
 			url : 'rest/organizations/getAllNames',
@@ -567,6 +697,69 @@ function addUser() {
 	obj["organization"] = $('#selectOrganization').val();
 	obj["password"] = $('#password').val();
 	obj["role"] = $('input[name="userType"]:checked').val();
+	let validate = true;
+	if ($("#firstName").val() == "") {
+		 $("#validationFirst").show();
+		 $("#firstName").css("border-color","red");
+		 validate = false;
+	}
+	else{
+		$("#validationFirst").hide();
+		$("#firstName").css("border-color","#ced4da");
+	}
+	if ($("#lastName").val() == "") {
+		 $("#validationLast").show();
+		 $("#lastName").css("border-color","red");
+		 validate = false;
+	}
+	else {
+		$("#validationLast").hide();
+		$("#firstName").css("border-color","#ced4da");
+	}
+	if ($("#email").val() == "") {
+		 $("#validationEmail").show();
+		 $("#email").css("border-color","red");
+		 validate = false;
+	}
+	else {
+		$("#validationEmail").hide();
+		$("#email").css("border-color","#ced4da");
+	}
+	if ( $('input[name="userType"]:checked').val() == undefined) {
+		 $("#validationRole").show();
+		 $('input[name="userType"]').css("border-color", "red");
+		 validate = false;
+	}
+	else {
+		$("#validationRole").hide();
+		$("#firstName").css("border-color","#ced4da");
+	}
+	if ($('#selectOrganization').val() == "") {
+		 $("#validationOrg").show();
+		 $("#selectOrganization").css("border-color","red");
+		 validate = false;
+	}
+	else {
+		$("#validationOrg").hide();
+		$("#selectOrganization").css("border-color","#ced4da");
+
+	}
+	if ($("#password").val() == "") {
+		 $("#validationPass").show();
+		 $("#password").css("border-color","red");
+		 validate = false;
+	}
+	else {
+		$("#validationPass").hide();
+		$("#password").css("border-color","#ced4da");
+
+	}
+	
+	if (!validate) {
+		toastr.error("All fields must be filled!");
+		return false;
+	}
+
 	
 	$.ajax({
 		async: false,
@@ -651,7 +844,6 @@ function getCategories() {
 }
 
 function showCategories(categories) {
-	
 	if (categories.length > 0) {
 		$("#div_center").load("html/vmCategory.html", function() {
 			for (let category of categories) {
@@ -676,7 +868,7 @@ function addCategoryTr(category){
 	let tdGpuCores = $('<td>' + category.numOfGpuCores + '</td>');
 	var buttonDelId = "del_" + category.name;
 	var buttonEditId = "edit_" + category.name;
-	let tdButtons = $('<td><button type="button" id = "' + buttonEditId + '" data-toggle="modal" class="btn btn-warning btn-rounded btn-sm my-0">Edit</button><button type="button" id = "' + buttonDelId + '" class="btn btn-danger btn-rounded btn-sm my-0">Delete</button></td>');
+	let tdButtons = $('<td><button type="button" id = "' + buttonEditId + '" data-toggle="modal" class="btn btn-warning btn-rounded btn-sm my-0">Update</button><button type="button" id = "' + buttonDelId + '" class="btn btn-danger btn-rounded btn-sm my-0">Delete</button></td>');
 
 	tr.append(tdName).append(tdCores).append(tdRam).append(tdGpuCores).append(tdButtons);
 	$('#vmcategory_table tbody').append(tr);
@@ -702,6 +894,12 @@ function addCategory() {
 	obj["numOfCores"] = $('#numOfCores').val();
 	obj["ram"] = $("#ram").val();
 	obj["numOfGpuCores"] = $('#gpu').val();	
+	if ($("#cat_name").val() == "")                                  
+	    { 
+	        window.alert("Please enter your name."); 
+	        name.focus(); 
+	        return false; 
+	    } 
 	$.ajax({
 		async: false,
 		type: 'POST',
@@ -845,12 +1043,15 @@ function addDiskTr(disk){
 	let tdType = $('<td>' + disk.diskType + '</td>');
 	let tdCapacity = $('<td>' + disk.capacity + 'GB</td>');
 	let tdOrganization = $('<td>' + disk.organization + '</td>');
-
+	let tdVM = $('<td>not connected</td>');
+	if (disk.virtualMachine != "") {
+		tdVM = $('<td>' + disk.virtualMachine.split(".")[0] + '</td>');
+	}
 	var buttonDelId = "del_" + disk.name;
 	var buttonEditId = "edit_" + disk.name;
-	let tdButtons = $('<td><button type="button" id = "' + buttonEditId + '" data-toggle="modal" class="btn btn-warning btn-rounded btn-sm my-0">Edit</button><button type="button" id = "' + buttonDelId + '" class="btn btn-danger btn-rounded btn-sm my-0">Delete</button></td>');
+	let tdButtons = $('<td><button type="button" id = "' + buttonEditId + '" data-toggle="modal" class="btn btn-warning btn-rounded btn-sm my-0">Update</button><button type="button" id = "' + buttonDelId + '" class="btn btn-danger btn-rounded btn-sm my-0">Delete</button></td>');
 
-	tr.append(tdName).append(tdType).append(tdCapacity).append(tdOrganization).append(tdButtons);
+	tr.append(tdName).append(tdType).append(tdCapacity).append(tdOrganization).append(tdVM).append(tdButtons);
 	$('#disks_table tbody').append(tr);
 	document.getElementById(buttonEditId).addEventListener("click", loadEditDisk);
 	document.getElementById(buttonDelId).addEventListener("click", deleteDisk);
@@ -917,13 +1118,14 @@ function addDisk() {
 	obj["name"] = $("#name").val();
 	obj["diskType"] = $('input[name="diskType"]:checked').val();
 	obj["capacity"] = $("#capacity").val();
-	obj["virtualMachine"] = $("#selectVM").val() + "." + $('#selectOrganization').val();
+	obj["virtualMachine"] = "";
+	if ($("#selectVM").val() != "") {
+		obj["virtualMachine"] = $("#selectVM").val() + "." + $('#selectOrganization').val();
+	}
 	obj["organization"] = $('#selectOrganization').val();
 
 	
-	$.ajax({
-		async: false,
-		type: 'POST',
+	$.post({
 		url : "rest/disks/add",
 		contentType : 'application/json',
 		dataType : 'json',
@@ -953,10 +1155,8 @@ function deleteDisk() {
 	var name = splitted[1];
 	var obj = {};
 	obj["name"] = name;
-	$.ajax({
-		async : false,
+	$.post({
 		url : 'rest/disks/delete',
-		type : 'POST',
 		contentType : 'application/json',
 		dataType : 'json',
 		data : JSON.stringify(obj),
@@ -1005,7 +1205,9 @@ function fillEditFieldsDisk(disk) {
 	$("#button_edit_disk").html("Update disk")
 	var obj = {};
 	obj["organization"] = disk.organization;
-	$.post({
+	$.ajax({
+		async: false,
+		type: 'POST',
 		url : 'rest/vms/getByCompany',
 		contentType : 'application/json',
 		dataType : 'json',
@@ -1019,6 +1221,7 @@ function fillEditFieldsDisk(disk) {
 	                var vm = vms[i].split(".")[0];
 	                $('#selectVM').append("<option value='"+vm+"'>"+vm+"</option>");
 	            }
+				
 			}
 			else {
 				$("#selectVM" ).prop( "disabled", true );
@@ -1031,12 +1234,11 @@ function fillEditFieldsDisk(disk) {
 		}
 });
 	if (disk.virtualMachine == "") {
-		$("#selectVM").val("not selected").change();
+		$("#selectVM").val("not connected").change();
 	}
 	else {
-		$("#selectVM").val(disk.virtualMachine).change();
+		$("#selectVM").val(disk.virtualMachine.split(".")[0]).change();
 	}
-	
 
 	
 }
@@ -1047,13 +1249,14 @@ function editDisk() {
 	obj["name"] = $("#name").val();
 	obj["diskType"] = $('input[name="diskType"]:checked').val();
 	obj["capacity"] = $("#capacity").val();
-	obj["virtualMachine"] = $("#selectVM").val();
+	obj["virtualMachine"] = "";
+	if ($("#selectVM").val() != "") {
+		obj["virtualMachine"] = $("#selectVM").val() + "." + $('#organization').val();
+	}
 	obj["organization"] = $('#organization').val();
 
 	
-	$.ajax({
-		async: false,
-		type: 'POST',
+	$.post({
 		url : "rest/disks/update",
 		contentType : 'application/json',
 		dataType : 'json',
@@ -1078,6 +1281,10 @@ function editDisk() {
 
 function searchDisks() {
 	var obj = {};
+	if (obj["name"] == "") {
+		toastr.error("Search input can't be empty");
+		return false;
+	}
 	obj["name"] = $("#search-input").val();
 	$.ajax({
 		url : 'rest/disks/search',
@@ -1092,6 +1299,15 @@ function searchDisks() {
 			toastr.error(errorThrown);
 		}
 	});
+}
+
+function validateNumber(evt) {
+	var charCode = (evt.which) ? evt.which : evt.keyCode
+	return !(charCode > 31 && (charCode < 48 || charCode > 57));
+}
+
+function filterSearchIntersection(searchResults, filterResults){
+	return searchResults.filter(a => filterResults.some(b => a.name === b.name));  
 }
 
 

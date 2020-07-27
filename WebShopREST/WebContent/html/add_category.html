@@ -1,28 +1,41 @@
-<form class="needs-validation" novalidate>
-	<div class="col-md-4 mb-3">
-		<label for="cat_name">VM name</label> <input type="text"
-			class="form-control" id="cat_name" placeholder="First name" required>
-		<div class="invalid-feedback">Name can't be empty</div>
+<script type="text/javascript" src="js/add_category.js"></script>
+<div class="container">
+	<div class="row justify-content-center">
+		<div class="col-md-6">
+			<form class="needs-validation" novalidate>
+				<div class="form-group">
+					<label for="cat_name">VM name</label> <input type="text"
+						class="form-control" id="cat_name"  placeholder="First name"
+						required>
+					<p><small id="validationName"
+							class="form-text text-muted">Field can't be empty</small></p>
+				</div>
+				<div class="form-group">
+					<label for="numofcores">Number of cores</label> <input
+						type="number" min="1" onkeypress="return validateNumber(event);" class="form-control" id="numOfCores"
+						placeholder="number of cores" required>
+					<p><small id="validationCores"
+							class="form-text text-muted">Field can't be empty</small></p>
+				</div>
+				<div class="form-group">
+					<label for="ram">Ram</label> <input type="number"
+						class="form-control" id="ram" min="1" onkeypress="return validateNumber(event);" placeholder="ram"
+						aria-describedby="inputGroupPrepend" required>
+					<p><small id="validationRam"
+							class="form-text text-muted">Field can't be empty</small></p>
+				</div>
+				<div class="form-group">
+					<label for="gpu">Gpu</label> <input type="number"
+						class="form-control" id="gpu" min="1" onkeypress="return validateNumber(event);" placeholder="number of gpu cores"
+						required>
+					<p><small id="validationGpu"
+							class="form-text text-muted">Field can't be empty</small></p>
+				</div>
+				<div class="form-group">
+					<button class="btn btn-primary btn-block" id="add_vmcategory"
+						type="button">Add Category</button>
+				</div>
+			</form>
+		</div>
 	</div>
-	<div class="col-md-4 mb-3">
-		<label for="numofcores">Number of cores</label> <input type="number"
-			class="form-control" id="numOfCores" placeholder="number of cores"
-			required>
-		<div class="invalid-feedback">Field can't be empty</div>
-	</div>
-	<div class="col-md-4 mb-3">
-		<label for="ram">Ram</label> <input type="number" class="form-control"
-			id="ram" placeholder="ram" aria-describedby="inputGroupPrepend"
-			required>
-		<div class="invalid-feedback">Field can't be empty</div>
-	</div>
-	<div class="col-md-4 mb-3">
-		<label for="gpu">Gpu</label> <input type="number" class="form-control"
-			id="gpu" placeholder="number of gpu cores" required>
-		<div class="invalid-feedback">Field can't be empty</div>
-	</div>
-	<div class="col-md-4 mb-3">
-		<button class="btn btn-primary" id="add_vmcategory" type="button">Submit
-			form</button>
-	</div>
-</form>
+</div>

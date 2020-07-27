@@ -5,9 +5,8 @@
 		"logo": "Appleincorporated.jpg",
 		"users": [],
 		"resources": [
-			"apple7.Apple incorporated",
-			"M90.Apple incorporated",
-			"M90x.Apple incorporated"
+			"M90x.Apple incorporated",
+			"M99.Apple incorporated"
 		]
 	},
 	{
@@ -15,12 +14,21 @@
 		"description": "45",
 		"logo": "amazonincorp.jpg",
 		"users": [],
-		"resources": []
+		"resources": [
+			"M90y.amazon incorp"
+		]
 	},
 	{
 		"name": "pixarc",
 		"description": "toy story",
 		"logo": "pixarc.jpg",
+		"users": [],
+		"resources": []
+	},
+	{
+		"name": "Arsenal",
+		"description": "Arsenal football club from London",
+		"logo": "Arsenal.jpg",
 		"users": [],
 		"resources": []
 	}

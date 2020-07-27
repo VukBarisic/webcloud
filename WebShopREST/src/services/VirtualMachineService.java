@@ -84,5 +84,13 @@ public class VirtualMachineService {
 		return Response.status(200).entity(VmRepository.getVmNamesByCompany(data.get("organization"))).build();
 
 	}
+	
+	@POST
+	@Path("/filter")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response filterVirtualMachines(HashMap<String, String> data) {
+		return Response.status(200).entity(VmRepository.filterVirtualMachines(data)).build();
+	}
 
 }

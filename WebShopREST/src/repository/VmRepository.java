@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.java_cup.internal.runtime.virtual_parse_stack;
 
 import model.Disk;
 import model.Organization;
@@ -112,9 +113,11 @@ public class VmRepository {
 		return true;
 	}
 
-	public static Object searchVirtualMachines(String name) {
-		// TODO Auto-generated method stub
-		return null;
+	public static List<VirtualMachine> searchVirtualMachines(String name) {
+		List<VirtualMachine> virtualMachines = getVirtualMachines().stream()
+				.filter(vm -> vm.getName().toLowerCase().contains(name.toLowerCase()))
+				.collect(Collectors.toList());
+		return virtualMachines;
 	}
 
 	public static VirtualMachine findByName(String name) {
@@ -136,13 +139,26 @@ public class VmRepository {
 
 	public static void diskUpdated(String oldName, Disk disk) {
 		List<VirtualMachine> virtualMachines = getVirtualMachines();
-		for (VirtualMachine vm : virtualMachines) {
-			if (vm.getName().equals(disk.getVirtualMachine())) {
-				List<String> disks = vm.getDisks().stream().map(d -> d.equals(oldName) ? disk.getName() : oldName)
-						.collect(Collectors.toList());
-				vm.setDisks(disks);
+		if (!disk.getName().equals(oldName)) {
+			for (VirtualMachine vm : virtualMachines) {
+				if (vm.getDisks().contains(oldName)) {
+					List<String> disks = vm.getDisks().stream().map(d -> d.equals(oldName) ? disk.getName() : oldName)
+							.collect(Collectors.toList());
+					vm.setDisks(disks);
+					break;
+				}
 			}
 		}
+		for (VirtualMachine vm : virtualMachines) {
+			if (vm.getDisks().contains(disk.getName()) && !vm.getName().equals(disk.getVirtualMachine())) {
+				vm.getDisks().removeIf(diskName -> diskName.equals(disk.getName()));
+			}
+			if (vm.getName().equals(disk.getVirtualMachine()) && !vm.getDisks().contains(disk.getName())) {
+				vm.getDisks().add(disk.getName());
+			}
+
+		}
+
 		try {
 			mapper.writeValue(Paths.get(
 					"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\virtualmachines.json")
@@ -151,5 +167,26 @@ public class VmRepository {
 
 			e.printStackTrace();
 		}
+	}
+
+	public static List<VirtualMachine> filterVirtualMachines(HashMap<String, String> data) {
+		List<VirtualMachine> virtualMachines = getVirtualMachines();
+		if (!data.get("ramFrom").equals("")) {
+			int ramFrom = Integer.parseInt(data.get("ramFrom"));
+			int ramTo = Integer.parseInt(data.get("ramTo"));
+			virtualMachines = virtualMachines.stream().filter(vm-> vm.getvMcategory().getRam() > ramFrom && vm.getvMcategory().getRam() < ramTo).collect(Collectors.toList());
+		}
+		if (!data.get("gpuFrom").equals("")) {
+			int gpuFrom = Integer.parseInt(data.get("gpuFrom"));
+			int gpuTo = Integer.parseInt(data.get("gpuTo"));
+			virtualMachines = virtualMachines.stream().filter(vm-> vm.getvMcategory().getNumOfGpuCores() > gpuFrom && vm.getvMcategory().getNumOfGpuCores() < gpuTo).collect(Collectors.toList());
+		}
+		if (!data.get("coresFrom").equals("")) {
+			int coresFrom = Integer.parseInt(data.get("coresFrom"));
+			int coresTo = Integer.parseInt(data.get("coresTo"));
+			virtualMachines = virtualMachines.stream().filter(vm-> vm.getvMcategory().getNumberOfCores() > coresFrom && vm.getvMcategory().getNumberOfCores() < coresTo).collect(Collectors.toList());
+		}
+		
+		return virtualMachines;
 	}
 }

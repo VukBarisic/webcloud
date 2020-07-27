@@ -1,9 +1,24 @@
-<div id="div_register" class="center_align">
-	<table>
-		<tr><th></th><th align="left">Add organization</th></tr>
-		<tr><td>Name:</td><td><input type="text" id="org_name"></td></tr>	
-		<tr><td>Description:</td><td><input type="text" id="org_desc"></td></tr>
-		<tr><td>Image:</td><td><input type="file" id="org_image" accept="image/*" required="required"></td></tr>			
-		<tr><td></td><td align="left" ><button id="button_add_org" class="button_ok">Add</button></td></tr>
-	</table>
+<div class="container">
+	<div class="col-md-6">
+		<div class="form-group">
+			<label for="vmname">Name</label> <input type="text"
+				class="form-control" id="org_name" placeholder="First name" required>
+			<p>
+				<small id="validationName" class="form-text text-muted">Field
+					can't be empty</small>
+			</p>
+		</div>
+		<div class="form-group">
+			<label for="org_desc">Description</label>
+			<textarea class="form-control" id="org_desc" placeholder="First name"
+				required> </textarea>
+			<p>
+				<small id="validationDesc" class="form-text text-muted">Field
+					can't be empty</small>
+			</p>
+		</div>
+	</div>
+	
+	<button id="button_add_org" class="button_ok">Add</button>
+
 </div>
