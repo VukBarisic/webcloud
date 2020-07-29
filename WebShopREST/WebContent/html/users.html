@@ -1,9 +1,7 @@
 <style>
-#right {
-    float:right;
-    width:100px;
-    height: 20px;
-   
+#add_user {
+   position: absolute;
+	left: 300px;
 }
 </style>
 
@@ -23,7 +21,11 @@
 
 		</tbody>
 	</table>
-	<button id="add_user" class="btn btn-primary btn-block" onclick="loadAddUser()">Add
+	<button id="add_user" class="btn btn-primary" onclick="loadAddUser()">Add
 		user</button>
+		 <div class="material-switch pull-right">
+                            <input id="someSwitchOptionDanger" name="someSwitchOption001" type="checkbox"/>
+                            <label for="someSwitchOptionDanger" class="label-danger"></label>
+                        </div>
 
 </div>

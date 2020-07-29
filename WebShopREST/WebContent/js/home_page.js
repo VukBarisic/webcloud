@@ -356,7 +356,7 @@ function addVirtualMachineTr(virtualMachine){
 
 	tr.append(tdName).append(tdCores).append(tdRam).append(tdGpuCores).append(organization).append(tdButtons);
 	$('#vmTable tbody').append(tr);
-	document.getElementById(buttonEditId).addEventListener("click", editVm);
+	document.getElementById(buttonEditId).addEventListener("click", loadEditVm);
 	document.getElementById(buttonDelId).addEventListener("click", deleteVm);
 
 
@@ -485,6 +485,61 @@ function addVirtualMachine() {
 			
 }
 
+function loadEditVm() {
+	var button_id = this.id;
+	var splitted = button_id.split('_');
+	var name = splitted[1];
+	var obj = {};
+	obj["name"] = name;
+	oldName = name;
+	$("#div_center").load("html/edit_vm.html", function() {
+		
+		$.post({
+			url : 'rest/vms/getByName',
+			contentType : 'application/json',
+			dataType : 'json',
+			data : JSON.stringify(obj),
+			success : function(vm) {
+				fillEditFieldsVm(vm);
+			},
+			error : function(errorThrown) {
+				toastr.error(errorThrown);
+			}
+	
+	});
+		$("#edit_vm").on("click", editVm);
+		
+	});
+}
+
+function fillEditFieldsVm(vm) {
+	$("#vmname").val(vm.name);
+	$("#selectCategory").val(vm.category);
+	$("#organization").val(vm.organization)
+	$("#edit_vm").html("Update vm")
+	var obj = {};
+	let index = 0;
+	$.get({
+		url : 'rest/vmcategories/getAllNames',
+		dataType : 'json',
+		success : function(categoryNames) {
+			var len = categoryNames.length;
+			$("#selectCategory").empty();
+            for( var i = 0; i<len; i++){
+                var cat = categoryNames[i];
+                if (vm.vMcategory.name == cat) {
+                	index = i;
+                }
+                $('#selectCategory').append("<option value='" + cat + "'>" + cat + "</option>");
+            }
+           $("#selectCategory").prop("selectedIndex", index).change();        	
+
+		}
+	});
+	
+
+}
+
 function editVm(){
 	
 }
@@ -548,7 +603,7 @@ function filterVM(){
 	obj["coresFrom"] = $("#coresFrom").val();
 	obj["coresTo"] = $("#coresTo").val();
 	
-	//validation
+	// validation
 	if ((obj["ramFrom"] == "" && obj["ramTo"] != "") || (obj["ramFrom"] != "" && obj["ramTo"] == "") )  {
 		toastr.error("One ram filter field is filled");
 		return false;
@@ -578,7 +633,7 @@ function filterVM(){
 		return false;
 	}
 	
-	//end of validation
+	// end of validation
 	
 	
 	$.ajax({
@@ -1031,7 +1086,7 @@ function showDisks(disks) {
 	else {
 		$("#div_center").load("html/no_disks.html");
 	}
-	$("#search-button").on("click", searchDisks);
+	$("#search-button").off().on("click", searchDisks);
 	$("#load_add_disk").on("click", loadAddDisk);
 }
 
@@ -1309,8 +1364,3 @@ function validateNumber(evt) {
 function filterSearchIntersection(searchResults, filterResults){
 	return searchResults.filter(a => filterResults.some(b => a.name === b.name));  
 }
-
-
-
-
-

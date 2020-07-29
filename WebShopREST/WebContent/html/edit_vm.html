@@ -1,0 +1,126 @@
+<style>
+#edit_vm {
+	position: absolute;
+	left: 100px;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+</style>
+
+<div class="container">
+
+	<div class="row justify-content-center">
+		<div class="col-md-6">
+			<form class="needs-validation" novalidate>
+					<div class="form-group">
+						<label for="vmname">VM name</label> <input type="text"
+							class="form-control" id="vmname" placeholder="First name"
+							required>
+						<p>
+							<small id="validationName" class="form-text text-muted">Field
+								can't be empty</small>
+						</p>
+					</div>
+					<label class="switch"> <input type="checkbox">
+						<span class="slider round"></span>
+					</label>
+		
+				<div class="row">
+					<div class="form-group col-md-6">
+						<label for="selectCategory">Select category</label> <select
+							id="selectCategory" class="form-control">
+						</select>
+						<p>
+							<small id="validationCat" class="form-text text-muted">Field
+								can't be empty</small>
+						</p>
+					</div>
+					<div class="form-group col-md-6">
+						<label for="organization">Organization</label> <input type = "text"
+							id="organization" class="form-control" disabled>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col form-group">
+						<label for="numofcores">Cores</label> <input type="number"
+							class="form-control" id="numOfCores"
+							placeholder="number of cores" disabled>
+					</div>
+					<div class="col form-group">
+						<label for="ram">Ram</label> <input type="number"
+							class="form-control" id="ram" placeholder="ram"
+							aria-describedby="inputGroupPrepend" disabled>
+					</div>
+					<div class="col form-group">
+						<label for="gpu">Gpu</label> <input type="number"
+							class="form-control" id="gpu" placeholder="number of gpu cores"
+							disabled>
+					</div>
+				</div>
+				<div class="form-group">
+					<button id="edit_vm" class="btn btn-primary" type="button">Add
+						virtual machine</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+

@@ -79,10 +79,18 @@ public class VirtualMachineService {
 	@Path("/getByCompany")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getbyName(HashMap<String, String> data) {
+	public Response getbyOrgName(HashMap<String, String> data) {
 
 		return Response.status(200).entity(VmRepository.getVmNamesByCompany(data.get("organization"))).build();
 
+	}
+	
+	@POST
+	@Path("/getByName")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getbyName(HashMap<String, String> data) {
+		return Response.status(200).entity(VmRepository.findByName(data.get("name"))).build();
 	}
 	
 	@POST
