@@ -1,8 +1,5 @@
 <style>
-#load_add_disk {
-	position: absolute;
-	left: 300px;
-}
+
 label {
 	position: absolute;
 	left: 200px;
@@ -12,7 +9,7 @@ label {
 	<div class="container">
 		<div class="row justify-content-center">
 			<form>
-			<label>Capacity</label>
+				<label>Capacity</label>
 				<div class="form-row">
 					<div class="col form-group">
 						<input type="number" onkeypress="return validateNumber(event);"
@@ -32,23 +29,24 @@ label {
 		</div>
 
 	</div>
-	<p>Disks</p>
+	<p class="text-center">Disks</p>
 	<table class="table table-striped" id="disks_table">
 		<thead>
 			<tr>
-				<th>Name</th>
-				<th>Type</th>
-				<th>Capacity</th>
-				<th>Organization</th>
-				<th>VM</th>
-				<th>Buttons</th>
+				<th class="text-center">Name</th>
+				<th class="text-center">Type</th>
+				<th class="text-center">Capacity</th>
+				<th class="text-center">Organization</th>
+				<th class="text-center">VM</th>
+				<th class="text-center">Buttons</th>
 			</tr>
 		</thead>
 		<tbody>
 
 		</tbody>
 	</table>
-	<button id="load_add_disk" class="btn btn-primary"
-		onclick="loadAddDisk()">Add disk</button>
-
+	<div class="text-center">
+		<button id="load_add_disk" class="btn btn-primary"
+			onclick="loadAddDisk()">Add disk</button>
+	</div>
 </div>

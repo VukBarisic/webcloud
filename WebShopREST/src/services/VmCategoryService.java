@@ -15,13 +15,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import helpers.HelperMethods;
-import model.Organization;
 import model.VMcategory;
-import model.VirtualMachine;
-import repository.OrganizationRepository;
-import repository.VmCategoryRepository;
-import repository.VmRepository;
 
+import repository.VmCategoryRepository;
 
 @Path("vmcategories")
 public class VmCategoryService {
@@ -64,7 +60,7 @@ public class VmCategoryService {
 
 		return Response.status(400).entity(HelperMethods.GetJsonValue("Error deleting")).build();
 	}
-	
+
 	@GET
 	@Path("/getAllNames")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -74,16 +70,17 @@ public class VmCategoryService {
 		return Response.status(200).entity(categories).build();
 
 	}
-	
+
 	@POST
 	@Path("/getByName")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getbyName(HashMap<String, String> data) {
 		VMcategory vMcategory = VmCategoryRepository.getCategoryByName(data.get("categoryName"));
-		if (vMcategory == null) return Response.status(400).entity("Error getting category").build();
+		if (vMcategory == null)
+			return Response.status(400).entity("Error getting category").build();
 		return Response.status(200).entity(vMcategory).build();
 
 	}
-	
+
 }

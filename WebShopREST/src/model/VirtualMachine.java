@@ -14,7 +14,7 @@ public class VirtualMachine {
 	private List<String> disks;
 
 	public VirtualMachine() {
-
+		
 	}
 
 	public VirtualMachine(String name, String organization, VMcategory vMcategory) {

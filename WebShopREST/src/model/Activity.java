@@ -1,30 +1,43 @@
 package model;
+import java.time.LocalDateTime;
 
-import java.time.LocalDate;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import helpers.LocalDateTimeDeserializer;
+import helpers.LocalDateTimeSerializer;
+
 
 public class Activity {
-
-	private LocalDate dateTurnedOn;
-	private LocalDate dateTurnedOff;
-
-	public Activity(LocalDate dateTurnedOn, LocalDate dateTurnedOff) {
-		this.dateTurnedOn = dateTurnedOn;
-		this.dateTurnedOff = dateTurnedOff;
+	@JsonDeserialize(using = LocalDateTimeDeserializer.class)
+	@JsonSerialize(using = LocalDateTimeSerializer.class)
+	private LocalDateTime dateTurnedOn;
+	@JsonDeserialize(using = LocalDateTimeDeserializer.class)
+	@JsonSerialize(using = LocalDateTimeSerializer.class)
+	private LocalDateTime dateTurnedOff;
+	
+	public Activity() {
 	}
 
-	public LocalDate getDateTurnedOn() {
+	public Activity(LocalDateTime dateTurnedOn) {
+		this.dateTurnedOn = dateTurnedOn;
+	}
+
+	
+
+	public LocalDateTime getDateTurnedOn() {
 		return dateTurnedOn;
 	}
 
-	public void setDateTurnedOn(LocalDate dateTurnedOn) {
+	public void setDateTurnedOn(LocalDateTime dateTurnedOn) {
 		this.dateTurnedOn = dateTurnedOn;
 	}
 
-	public LocalDate getDateTurnedOff() {
+	public LocalDateTime getDateTurnedOff() {
 		return dateTurnedOff;
 	}
 
-	public void setDateTurnedOff(LocalDate dateTurnedOff) {
+	public void setDateTurnedOff(LocalDateTime dateTurnedOff) {
 		this.dateTurnedOff = dateTurnedOff;
 	}
 

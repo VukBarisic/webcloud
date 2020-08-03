@@ -8,7 +8,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import model.Organization;
 import model.User;
 
 public class UserRepository {

@@ -14,10 +14,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import helpers.HelperMethods;
-import model.VMcategory;
 import model.VirtualMachine;
-import repository.OrganizationRepository;
-import repository.VmCategoryRepository;
 import repository.VmRepository;
 
 @Path("vms")
@@ -100,5 +97,15 @@ public class VirtualMachineService {
 	public Response filterVirtualMachines(HashMap<String, String> data) {
 		return Response.status(200).entity(VmRepository.filterVirtualMachines(data)).build();
 	}
+	
+	
+	@POST
+	@Path("/offOn")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response turnVirtualMachinesOffOn(HashMap<String, String> data) {
+		return Response.status(200).entity(HelperMethods.GetJsonValue(VmRepository.turnVirtualMachinesOffOn(data))).build();
+	}
 
+	
 }

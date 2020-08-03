@@ -1,26 +1,22 @@
-<style>
-#add_vmcategory {
-	position: absolute;
-	left: 300px;
-}
-</style>
+
 <div>
-	<p>VM categories</p>
+	<p class="text-center">Categories</p>
 	<table class="table table-striped" id="vmcategory_table">
 		<thead>
 			<tr>
-				<th>Name</th>
-				<th>Core number</th>
-				<th>RAM</th>
-				<th>GPU</th>
-				<th>Buttons</th>
+				<th class="text-center">Name</th>
+				<th class="text-center">Cores</th>
+				<th class="text-center">RAM</th>
+				<th class="text-center">GPU</th>
+				<th class="text-center">Buttons</th>
 			</tr>
 		</thead>
 		<tbody>
 
 		</tbody>
 	</table>
-	<button id="add_vmcategory" class="btn btn-primary"
-		onclick="loadAddVmCategory()">Add vm category</button>
-
+	<div class="text-center">
+		<button id="add_vmcategory" class="btn btn-primary"
+			onclick="loadAddVmCategory()">Add vm category</button>
+	</div>
 </div>

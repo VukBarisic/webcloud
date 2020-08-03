@@ -1,5 +1,6 @@
 package services;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 
@@ -17,11 +18,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.sun.tracing.dtrace.ProviderAttributes;
 
 import helpers.HelperMethods;
 import model.User;
-import repository.OrganizationRepository;
 import repository.UserRepository;
 
 @Path("/users")
@@ -53,10 +52,7 @@ public class UserService {
 			return Response.status(400).entity("Invalid username and/or password").build();
 		}
 		request.getSession().setAttribute("user", user);
-		List<User> users = (List<User>) ctx.getAttribute("users");
-		for (User user2 : users) {
-			System.out.println(HelperMethods.GetJsonValue(user2));
-		}
+		
 		
 		return Response.status(200).entity(HelperMethods.GetJsonValue(user)).build();
 

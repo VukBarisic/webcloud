@@ -1,55 +1,46 @@
-<style>
-#add_organization {
-	position: absolute;
-	left: 300px;
-}
 
-td {
-	width: 100%;
-	height: 100%;
-	text-align: center;
-}
-</style>
 <div id="organizations_div">
-	<p>Organizations</p>
+	<p class="text-center">Organizations</p>
 
 	<table class="table table-striped" id="organizationsTable">
 		<thead>
 			<tr>
-				<th>Logo</th>
-				<th>Description</th>
-				<th>Name</th>
-				<th>Buttons</th>
+				<th class="text-center">Logo</th>
+				<th class="text-center">Description</th>
+				<th class="text-center">Name</th>
+				<th class="text-center">Buttons</th>
 			</tr>
 		</thead>
 		<tbody>
 		</tbody>
 	</table>
-
-	<button id="add_organization" class="btn btn-primary"
-		onclick="loadAddOrganization()">Add organization</button>
+	<div class="text-center">
+		<button id="add_organization" class="btn btn-primary"
+			onclick="loadAddOrganization()">Add organization</button>
+	</div>
 </div>
 
 <!-- Modal -->
 <div id="editOrgModal" class="modal fade">
-  <div class="modal-dialog">
+	<div class="modal-dialog">
 
-    <!-- Modal content-->
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">File upload form</h4>
-      </div>
-      <div class="modal-body">
-        <!-- Form -->
-        <form method='post' action='' enctype="multipart/form-data">
-          Select file : <input type='file' name='file' id='file' class='form-control' ><br>
-          <input type='button' class='btn btn-info' value='Upload' id='btn_upload'>
-        </form>
+		<!-- Modal content-->
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">File upload form</h4>
+			</div>
+			<div class="modal-body">
+				<!-- Form -->
+				<form method='post' action='' enctype="multipart/form-data">
+					Select file : <input type='file' name='file' id='file'
+						class='form-control'><br> <input type='button'
+						class='btn btn-info' value='Upload' id='btn_upload'>
+				</form>
 
-      </div>
- 
-    </div>
+			</div>
 
-  </div>
+		</div>
+
+	</div>
 </div>

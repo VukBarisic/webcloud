@@ -8,14 +8,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.persistence.GeneratedValue;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import model.Disk;
 import model.DiskType;
-import model.Organization;
-import model.VMcategory;
 import model.VirtualMachine;
 
 public class DiskRepository {
@@ -116,7 +112,6 @@ public class DiskRepository {
 
 	public static boolean updateDisk(HashMap<String, String> data) {
 		try {
-			ArrayList<VirtualMachine> virtualMachines = VmRepository.getVirtualMachines();
 			ArrayList<Disk> disks = getDisks();
 			int capacity = Integer.parseInt(data.get("capacity"));
 			for (Disk d : disks) {

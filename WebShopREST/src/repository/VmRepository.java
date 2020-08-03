@@ -2,17 +2,20 @@ package repository;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.java_cup.internal.runtime.virtual_parse_stack;
 
+import javafx.geometry.HPos;
+import model.Activity;
 import model.Disk;
 import model.Organization;
 import model.VMcategory;
@@ -30,6 +33,11 @@ public class VmRepository {
 							"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\virtualmachines.json")
 							.toFile(), VirtualMachine[].class)));
 
+			/*
+			 * List<VirtualMachine> vms = virtualMachines.stream() .filter(virtualMachine ->
+			 * virtualMachine.getActivities().equals(null)) .peek(vm -> vm.setActivities(new
+			 * ArrayList<>())).collect(Collectors.toList()); //
+			 */
 			return virtualMachines;
 
 		} catch (Exception e) {
@@ -115,8 +123,7 @@ public class VmRepository {
 
 	public static List<VirtualMachine> searchVirtualMachines(String name) {
 		List<VirtualMachine> virtualMachines = getVirtualMachines().stream()
-				.filter(vm -> vm.getName().toLowerCase().contains(name.toLowerCase()))
-				.collect(Collectors.toList());
+				.filter(vm -> vm.getName().toLowerCase().contains(name.toLowerCase())).collect(Collectors.toList());
 		return virtualMachines;
 	}
 
@@ -174,19 +181,59 @@ public class VmRepository {
 		if (!data.get("ramFrom").equals("")) {
 			int ramFrom = Integer.parseInt(data.get("ramFrom"));
 			int ramTo = Integer.parseInt(data.get("ramTo"));
-			virtualMachines = virtualMachines.stream().filter(vm-> vm.getvMcategory().getRam() > ramFrom && vm.getvMcategory().getRam() < ramTo).collect(Collectors.toList());
+			virtualMachines = virtualMachines.stream()
+					.filter(vm -> vm.getvMcategory().getRam() > ramFrom && vm.getvMcategory().getRam() < ramTo)
+					.collect(Collectors.toList());
 		}
 		if (!data.get("gpuFrom").equals("")) {
 			int gpuFrom = Integer.parseInt(data.get("gpuFrom"));
 			int gpuTo = Integer.parseInt(data.get("gpuTo"));
-			virtualMachines = virtualMachines.stream().filter(vm-> vm.getvMcategory().getNumOfGpuCores() > gpuFrom && vm.getvMcategory().getNumOfGpuCores() < gpuTo).collect(Collectors.toList());
+			virtualMachines = virtualMachines.stream().filter(vm -> vm.getvMcategory().getNumOfGpuCores() > gpuFrom
+					&& vm.getvMcategory().getNumOfGpuCores() < gpuTo).collect(Collectors.toList());
 		}
 		if (!data.get("coresFrom").equals("")) {
 			int coresFrom = Integer.parseInt(data.get("coresFrom"));
 			int coresTo = Integer.parseInt(data.get("coresTo"));
-			virtualMachines = virtualMachines.stream().filter(vm-> vm.getvMcategory().getNumberOfCores() > coresFrom && vm.getvMcategory().getNumberOfCores() < coresTo).collect(Collectors.toList());
+			virtualMachines = virtualMachines.stream().filter(vm -> vm.getvMcategory().getNumberOfCores() > coresFrom
+					&& vm.getvMcategory().getNumberOfCores() < coresTo).collect(Collectors.toList());
 		}
-		
+
 		return virtualMachines;
+	}
+
+	public static boolean turnVirtualMachinesOffOn(HashMap<String, String> data) {
+		ArrayList<VirtualMachine> virtualMachines = getVirtualMachines();
+		data.get("time");
+		LocalDateTime time = LocalDateTime.ofInstant(Instant.ofEpochMilli(Long.parseLong(data.get("time"))),
+				TimeZone.getDefault().toZoneId());
+		VirtualMachine vm = findByName(data.get("name"));
+		if (Boolean.parseBoolean(data.get("turnedOn"))) {
+			Activity activity = new Activity();
+			activity.setDateTurnedOn(time);
+			vm.getActivities().add(activity);
+		} else {
+			vm.getActivities().get(vm.getActivities().size() - 1).setDateTurnedOff(time);
+		}
+		List<VirtualMachine> vms = virtualMachines.stream()
+				.map(virtualMachine -> virtualMachine.getName().equals(data.get("name")) ? vm : virtualMachine)
+				.collect(Collectors.toList());
+		
+		for (Activity a: vm.getActivities()) {
+			if (a.getDateTurnedOff() != null) {
+				System.out.println(a.getDateTurnedOn().until(a.getDateTurnedOff(), ChronoUnit.SECONDS));
+			}
+		}
+
+		try {
+			mapper.writeValue(Paths.get(
+					"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\virtualmachines.json")
+					.toFile(), vms);
+			return true;
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		}
+		return false;
+
 	}
 }

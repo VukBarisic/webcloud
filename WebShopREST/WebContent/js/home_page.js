@@ -158,7 +158,7 @@ function showOrganizations(organizations) {
 
 
 function addOrganizationTr(organization){
-	let tr = $('<tr></tr>');
+	let tr = $('<tr class="text-center"></tr>');
 	let tdLogo = $('<td style="width:70%" class="w-25"><img style="width:100%;" class="img-responsive" src= imgs/' + organization.logo  + ' alt="Error loading"></td>');
 	let tdBroj = $('<td>' + organization.description + '</td>');
 	let tdIme = $('<td>' + organization.name + '</td>');
@@ -344,7 +344,7 @@ function showVirtualMachines(virtualMachines){
 }
 
 function addVirtualMachineTr(virtualMachine){
-	let tr = $('<tr></tr>');
+	let tr = $('<tr class="text-center"></tr>');
 	let tdName = $('<td>' + virtualMachine.name.split(".")[0]  + '</td>');
 	let tdCores = $('<td>' + virtualMachine.vMcategory.numberOfCores + '</td>');
 	let tdRam = $('<td>' + virtualMachine.vMcategory.ram + '</td>');
@@ -513,10 +513,13 @@ function loadEditVm() {
 }
 
 function fillEditFieldsVm(vm) {
-	$("#vmname").val(vm.name);
+	$("#vmname").val(vm.name.split(".")[0]);
 	$("#selectCategory").val(vm.category);
 	$("#organization").val(vm.organization)
 	$("#edit_vm").html("Update vm")
+	if (vm.activities.length != 0 && vm.activities[vm.activities.length-1].dateTurnedOff == null) {
+		$("#vmOffOn").prop('checked', true);
+	}
 	var obj = {};
 	let index = 0;
 	$.get({
@@ -688,7 +691,7 @@ function showUsers(users) {
 
 
 function addUserTr(user){
-	let tr = $('<tr></tr>');
+	let tr = $('<tr class="text-center"></tr>');
 	let tdEmail = $('<td>' + user.email  + '</td>');
 	let tdFirstName = $('<td>' + user.firstName + '</td>');
 	let tdLastName = $('<td>' + user.lastName  + '</td>');
@@ -916,7 +919,7 @@ function showCategories(categories) {
 
 
 function addCategoryTr(category){
-	let tr = $('<tr></tr>');
+	let tr = $('<tr class="text-center"></tr>');
 	let tdName = $('<td>' + category.name  + '</td>');
 	let tdCores = $('<td>' + category.numberOfCores + '</td>');
 	let tdRam = $('<td>' + category.ram + 'GB</td>');
@@ -1093,7 +1096,7 @@ function showDisks(disks) {
 
 
 function addDiskTr(disk){
-	let tr = $('<tr></tr>');
+	let tr = $('<tr class="text-center"></tr>');
 	let tdName = $('<td>' + disk.name + '</td>');
 	let tdType = $('<td>' + disk.diskType + '</td>');
 	let tdCapacity = $('<td>' + disk.capacity + 'GB</td>');
@@ -1364,3 +1367,42 @@ function validateNumber(evt) {
 function filterSearchIntersection(searchResults, filterResults){
 	return searchResults.filter(a => filterResults.some(b => a.name === b.name));  
 }
+
+$(document).on("change", "#vmOffOn", function(){	
+	
+	if (!this.checked) {
+        var sure = confirm("Are you sure you want to turn off virtual machine?");
+        this.checked = !sure;
+    }
+	else {
+        var sure = confirm("Are you sure you want to turn on virtual machine?");
+        this.checked = sure;
+
+    }
+	if (sure) {
+		obj = {};
+		obj["name"] = $("#vmname").val() + "." + $("#organization").val();
+		obj["time"] = new Date().getTime();		
+		obj["turnedOn"] = this.checked;
+		$.post({
+			url : "rest/vms/offOn",
+			contentType : 'application/json',
+			dataType : 'json',
+			data : JSON.stringify(obj),
+			success : function(data) {
+				if(data == "success")
+				{
+					if (this.checked) {
+						toastr.success("You've successfully turned virtual machine on!");
+					}
+					else {
+						toastr.success("You've successfully turned virtual machine off!");
+					}
+				}
+			},
+			error: function(errorThrown ){
+				toastr.error( errorThrown );
+			}
+		});
+	}
+});
