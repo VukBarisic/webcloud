@@ -11,12 +11,12 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import model.Organization;
-
+import model.VirtualMachine;
 
 public class OrganizationRepository {
 
 	public static ObjectMapper mapper = new ObjectMapper();
-	
+
 	public static ArrayList<Organization> getOrganizations() {
 
 		try {
@@ -91,7 +91,7 @@ public class OrganizationRepository {
 				.collect(Collectors.toList());
 		return organizations;
 	}
-	
+
 	public static List<String> getOrganizationsNames() {
 		List<String> organizationsNames = new ArrayList<>();
 		for (Organization org : getOrganizations()) {
@@ -99,5 +99,24 @@ public class OrganizationRepository {
 		}
 		return organizationsNames;
 	}
-	
+
+	public static void vmUpdated(String oldName, String newName) {
+		List<Organization> organizations = getOrganizations();
+		for (Organization org : organizations) {
+			List<String> resources = org.getResources().stream().map(r -> r.equals(oldName) ? newName : r)
+					.collect(Collectors.toList());
+			org.setResources(resources);
+		}
+	try
+
+	{
+	mapper.writeValue(Paths.get(
+			"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\organizations.json")
+			.toFile(), organizations);
+	}
+	catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	}
 }

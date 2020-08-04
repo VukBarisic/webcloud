@@ -546,8 +546,8 @@ function fillEditFieldsVm(vm) {
 function editVm(){
 	var obj = {};
 	obj["oldName"] = oldName;
-	obj["name"] = $("#vmname").val();
-	obj["selectCategory"] = $('#category').val();
+	obj["name"] = $("#vmname").val() + "." + $("#organization").val();
+	obj["category"] = $('#selectCategory').val();
 
 	$.post({
 		url : "rest/vms/update",

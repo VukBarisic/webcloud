@@ -15,6 +15,7 @@ import javax.ws.rs.core.Response;
 
 import helpers.HelperMethods;
 import model.VirtualMachine;
+import repository.DiskRepository;
 import repository.VmRepository;
 
 @Path("vms")
@@ -107,5 +108,19 @@ public class VirtualMachineService {
 		return Response.status(200).entity(HelperMethods.GetJsonValue(VmRepository.turnVirtualMachinesOffOn(data))).build();
 	}
 
-	
+	@POST
+	@Path("/update")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response updateVM(HashMap<String, String> data) {
+		if (!data.get("oldName").equals(data.get("name")) && !VmRepository.isUniqueVm(data.get("name"))) {
+			return Response.status(200).entity("existError").build();
+		}
+		boolean success = VmRepository.updateVm(data);
+		if (!success) {
+			return Response.status(400).entity("Error updating vm").build();
+		}
+		return Response.status(200).entity(HelperMethods.GetJsonValue(success)).build();
+
+	}
 }

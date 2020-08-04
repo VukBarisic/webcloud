@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.geometry.HPos;
 import model.Activity;
 import model.Disk;
+import model.DiskType;
 import model.Organization;
 import model.VMcategory;
 import model.VirtualMachine;
@@ -257,5 +258,33 @@ public class VmRepository {
 		}
 		}
 		
+	}
+
+	public static boolean updateVm(HashMap<String, String> data) {
+		try {
+			ArrayList<VirtualMachine> virtualMachines = getVirtualMachines();
+			VMcategory vMcategory = VmCategoryRepository.findByName(data.get("category"));
+			if (vMcategory == null) {
+				return false;
+			}
+			for (VirtualMachine vm : virtualMachines) {
+				if (vm.getName().equals(data.get("oldName"))) {
+					vm.setName(data.get("name"));
+					vm.setvMcategory(vMcategory);
+					if (!data.get("oldName").equals(data.get("name"))) {
+						OrganizationRepository.vmUpdated(data.get("oldName"), data.get("name"));
+					}
+				}
+			}
+
+			mapper.writeValue(Paths.get(
+					"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\virtualmachines.json")
+					.toFile(), virtualMachines);
+			return true;
+		} catch (IOException e) {
+
+			e.printStackTrace();
+			return false;
+		}
 	}
 }
