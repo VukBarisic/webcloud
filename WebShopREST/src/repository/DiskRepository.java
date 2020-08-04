@@ -124,7 +124,7 @@ public class DiskRepository {
 					else
 						d.setDiskType(DiskType.SSD);
 					VmRepository.diskUpdated(data.get("oldName"), d);
-					
+
 				}
 			}
 
@@ -137,6 +137,16 @@ public class DiskRepository {
 			e.printStackTrace();
 			return false;
 		}
+	}
+
+	public static List<Disk> filterDisks(HashMap<String, String> data) {
+		List<Disk> disks = getDisks();
+		int capacityFrom = Integer.parseInt(data.get("capacityFrom"));
+		int capacityTo = Integer.parseInt(data.get("capacityTo"));
+		disks = disks.stream().filter(disk -> disk.getCapacity() > capacityFrom && disk.getCapacity() < capacityTo)
+				.collect(Collectors.toList());
+
+		return disks;
 	}
 
 }

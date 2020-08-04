@@ -1119,6 +1119,8 @@ function searchCategories() {
 
 
 function getDisks() {
+	searchResults = [];
+	filterResults = [];
 	$.get({
 		url : 'rest/disks/getAll',
 		dataType : 'json',
@@ -1144,6 +1146,7 @@ function showDisks(disks) {
 		$("#div_center").load("html/no_disks.html");
 	}
 	$("#search-button").off().on("click", searchDisks);
+	$("#filter_disks").on("click", filterDisks);
 	$("#load_add_disk").on("click", loadAddDisk);
 }
 
@@ -1393,11 +1396,11 @@ function editDisk() {
 
 function searchDisks() {
 	var obj = {};
+	obj["name"] = $("#search-input").val();
 	if (obj["name"] == "") {
 		toastr.error("Search input can't be empty");
 		return false;
 	}
-	obj["name"] = $("#search-input").val();
 	$.ajax({
 		url : 'rest/disks/search',
 		type : 'POST',
@@ -1405,13 +1408,61 @@ function searchDisks() {
 		dataType : 'json',
 		data : JSON.stringify(obj),
 		success : function(disks) {
-			showDisks(disks);
+			searchResults = disks;
+			if (filterResults.length > 0) {
+				showDisks(filterSearchIntersection(searchResults, filterResults));
+			}
+			else {
+				showDisks(disks);
+			}
 		},
 		error : function(errorThrown) {
 			toastr.error(errorThrown);
 		}
 	});
 }
+
+function filterDisks(){
+	var obj = {};
+	obj["capacityFrom"] = $("#capacityFrom").val();
+	obj["capacityTo"] = $("#capacityTo").val();
+	
+	// validation
+	if ((obj["capacityFrom"] == "" && obj["capacityTo"] != "") || (obj["capacityFrom"] != "" && obj["capacityTo"] == "") )  {
+		toastr.error("Both fields must be filled!");
+		return false;
+	}
+	if ((obj["capacityFrom"] == "" && obj["capacityTo"] == "")) {
+		toastr.error("All fields are empty!");
+		return false;
+	}
+	if (parseInt(obj["capacityFrom"]) >= parseInt(obj["capacityTo"])) {
+		toastr.error("Right field number has to be bigger than left");
+		return false;
+	}
+	
+	
+	$.ajax({
+		url : 'rest/disks/filter',
+		type : 'POST',
+		contentType : 'application/json',
+		dataType : 'json',
+		data : JSON.stringify(obj),
+		success : function(disks) {
+			filterResults = disks;
+			if (searchResults.length > 0) {
+				showDisks(filterSearchIntersection(searchResults, filterResults));
+			}
+			else {
+				showDisks(disks);
+			}
+		},
+		error : function(errorThrown) {
+			toastr.error(errorThrown);
+		}
+	});
+	}
+
 
 function validateNumber(evt) {
 	var charCode = (evt.which) ? evt.which : evt.keyCode

@@ -16,6 +16,7 @@ import javax.ws.rs.core.Response;
 import helpers.HelperMethods;
 import model.Disk;
 import repository.DiskRepository;
+import repository.VmRepository;
 
 
 @Path("/disks")
@@ -99,5 +100,13 @@ public class DiskService {
 		}
 		return Response.status(200).entity(HelperMethods.GetJsonValue(success)).build();
 
+	}
+	
+	@POST
+	@Path("/filter")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response filterDisks(HashMap<String, String> data) {
+		return Response.status(200).entity(DiskRepository.filterDisks(data)).build();
 	}
 }
