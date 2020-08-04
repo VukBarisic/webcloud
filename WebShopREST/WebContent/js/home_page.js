@@ -24,12 +24,126 @@ function loadHomePage() {
 		$("#users").on("click", getUsers);
 		$("#disks").on("click", getDisks);
 		$("#vmCategories").on("click", getCategories);
+		$("#myProfile").on("click", loadMyProfile);
 		$("#logout").on("click", logout);
 
 
 	}
 
 }
+
+function loadMyProfile() {
+	$("#div_center").load("html/editMyProfile.html", function() {
+		$("#updateMyProfile").on("click", editMyProfile);
+		fillMyProfileFields();
+	});
+}
+
+
+function fillMyProfileFields() {
+	$("#validationFirst").hide();
+	$("#validationLast").hide();
+	$("#validationEmail").hide();
+	$("#validationOrg").hide();
+	$("#validationPassRep").hide();
+	$("#firstName").val(loggedUser.firstName);
+	$("#lastName").val(loggedUser.lastName);
+	$("#email").val(loggedUser.email);
+	if (loggedUser.organization == "" ) {
+		$("#orgform").remove();
+	}
+	else {
+		$("#organization").val(loggedUser.organization);
+		$("#organization").prop( "disabled", true );
+	}
+	$("#add_vmcategory").html("update")
+}
+
+
+function editMyProfile() {
+
+	var obj = {};
+	obj["email"] = $("#email").val();
+	obj["firstName"] = $('#firstName').val();
+	obj["lastName"] = $("#lastName").val();
+	obj["password"] = $('#password').val();
+	obj["confirm_password"] = $('#confirm_password').val();
+	let validate = true;
+	if ($("#firstName").val() == "") {
+		 $("#validationFirst").show();
+		 $("#firstName").css("border-color","red");
+		 validate = false;
+	}
+	else{
+		$("#validationFirst").hide();
+		$("#firstName").css("border-color","#ced4da");
+	}
+	if ($("#lastName").val() == "") {
+		 $("#validationLast").show();
+		 $("#lastName").css("border-color","red");
+		 validate = false;
+	}
+	else {
+		$("#validationLast").hide();
+		$("#lastName").css("border-color","#ced4da");
+	}
+	if ($("#email").val() == "") {
+		 $("#validationEmail").show();
+		 $("#email").css("border-color","red");
+		 validate = false;
+	}
+	else {
+		$("#validationEmail").hide();
+		$("#email").css("border-color","#ced4da");
+	}
+	if ($('#organization').val() == "") {
+		 $("#validationOrg").show();
+		 $("#organization").css("border-color","red");
+		 validate = false;
+	}
+	else {
+		$("#validationOrg").hide();
+		$("#organization").css("border-color","#ced4da");
+
+	}
+	if (obj["password"] != obj["confirm_password"]) {
+		$("#validationPassRep").show();
+		$("#confirm_password").css("border-color","red");
+		$("#password").css("border-color","red");
+        return false;
+    }
+	else{
+		$("#validationPassRep").hide();
+		$("#password").css("border-color","#ced4da");
+		$("#confirm_password").css("border-color","#ced4da");
+	}
+	
+	if (!validate) {
+		toastr.error("All fields must be filled!");
+		return false;
+	}
+
+	
+	$.ajax({
+		async: false,
+		type: 'POST',
+		url : "rest/users/updateMyProfile",
+		contentType : 'application/json',
+		dataType : 'json',
+		data : JSON.stringify(obj),
+		success : function(user) {
+				loggedUser = user;
+				toastr.success("You've successfully updated your profile!");
+        		getUsers(); 
+		},
+		error: function(errorThrown ){
+			toastr.error( errorThrown );
+		}
+	});
+	
+	
+}
+
 
 
 function loadLoginPage() {
