@@ -1,6 +1,7 @@
 package services;
 
 import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -76,10 +77,27 @@ public class VmCategoryService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getbyName(HashMap<String, String> data) {
-		VMcategory vMcategory = VmCategoryRepository.getCategoryByName(data.get("categoryName"));
+		VMcategory vMcategory = VmCategoryRepository.getCategoryByName(data.get("name"));
 		if (vMcategory == null)
 			return Response.status(400).entity("Error getting category").build();
 		return Response.status(200).entity(vMcategory).build();
+
+	}
+
+	@POST
+	@Path("/update")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response updateCategory(HashMap<String, String> data) {
+		if (!data.get("oldName").equals(data.get("name"))
+				&& !VmCategoryRepository.isUniqueVmCategory(data.get("name"))) {
+			return Response.status(200).entity("existError").build();
+		}
+		boolean success = VmCategoryRepository.updateCategory(data);
+		if (!success) {
+			return Response.status(400).entity("Error updating category").build();
+		}
+		return Response.status(200).entity(HelperMethods.GetJsonValue(success)).build();
 
 	}
 

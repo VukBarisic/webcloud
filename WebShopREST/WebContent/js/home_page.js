@@ -164,7 +164,7 @@ function addOrganizationTr(organization){
 	let tdIme = $('<td>' + organization.name + '</td>');
 	var buttonDelId = "del_" + organization.name;
 	var buttonEditId = "edit_" + organization.name;
-	let tdButtons = $('<td><button type="button" id = "' + buttonEditId + '" data-toggle="modal" class="btn btn-warning btn-rounded btn-sm my-0">Update</button><button type="button" id = "' + buttonDelId + '" class="btn btn-danger btn-rounded btn-sm my-0">Delete</button></td>');
+	let tdButtons = $('<td><button type="button" id = "' + buttonEditId + '" data-toggle="modal" class="btn btn-warning btn-rounded btn-sm my-0"><i class="fa fa-edit"></i></button><button type="button" id = "' + buttonDelId + '" class="btn btn-danger btn-rounded btn-sm my-0"><i class="fa fa-times" aria-hidden="true"></i></button></td>');
 
 	tr.append(tdLogo).append(tdBroj).append(tdIme).append(tdButtons);
 	$('#organizationsTable tbody').append(tr);
@@ -352,7 +352,7 @@ function addVirtualMachineTr(virtualMachine){
 	let organization = $('<td>' + virtualMachine.organization + '</td>');
 	var buttonDelId = "del_" + virtualMachine.name;
 	var buttonEditId = "edit_" + virtualMachine.name;
-	let tdButtons = $('<td><button type="button" id = "' + buttonEditId + '" data-toggle="modal" class="btn btn-warning btn-rounded btn-sm my-0">Update</button><button type="button" id = "' + buttonDelId + '" class="btn btn-danger btn-rounded btn-sm my-0">Delete</button></td>');
+	let tdButtons = $('<td><button type="button" id = "' + buttonEditId + '" data-toggle="modal" class="btn btn-warning btn-rounded btn-sm my-0"><i class="fa fa-edit"></i></button><button type="button" id = "' + buttonDelId + '" class="btn btn-danger btn-rounded btn-sm my-0"><i class="fa fa-times" aria-hidden="true"></i></button></td>');
 
 	tr.append(tdName).append(tdCores).append(tdRam).append(tdGpuCores).append(organization).append(tdButtons);
 	$('#vmTable tbody').append(tr);
@@ -400,7 +400,7 @@ function loadAddVm() {
 }
 $(document).on("change", "#selectCategory", function(){
 	var obj = {};
-	obj["categoryName"] = $(this).val();
+	obj["name"] = $(this).val();
 	$.post({
 		url : 'rest/vmcategories/getByName',
 		contentType : 'application/json',
@@ -544,6 +544,31 @@ function fillEditFieldsVm(vm) {
 }
 
 function editVm(){
+	var obj = {};
+	obj["oldName"] = oldName;
+	obj["name"] = $("#vmname").val();
+	obj["selectCategory"] = $('#category').val();
+
+	$.post({
+		url : "rest/vms/update",
+		contentType : 'application/json',
+		dataType : 'json',
+		data : JSON.stringify(obj),
+		success : function(data) {
+			if(data == "existError")
+			{
+				toastr.error("Vm name already exists!");
+			}
+			else (data == "success")
+			{
+				toastr.success("You've successfully updated virtual machine!");
+        		getVirtualMachines(); 
+			}
+		},
+		error: function(errorThrown ){
+			toastr.error( errorThrown );
+		}
+	});
 	
 }
 
@@ -710,7 +735,7 @@ function addUserTr(user){
 	else{
 		var buttonDelId = "deluser_" + user.email;
 		var buttonEditId = "edituser_" + user.email;
-		let tdButtons = $('<td><button type="button" id = "' + buttonEditId + '" data-toggle="modal" class="btn btn-warning btn-rounded btn-sm my-0">Update</button><button type="button" id = "' + buttonDelId + '" class="btn btn-danger btn-rounded btn-sm my-0">Delete</button></td>');
+		let tdButtons = $('<td><button type="button" id = "' + buttonEditId + '" data-toggle="modal" class="btn btn-warning btn-rounded btn-sm my-0"><i class="fa fa-edit"></i></button><button type="button" id = "' + buttonDelId + '" class="btn btn-danger btn-rounded btn-sm my-0"><i class="fa fa-times" aria-hidden="true"></i></button></td>');
 		tr.append(tdEmail).append(tdFirstName).append(tdLastName).append(tdOrg).append(tdButtons);
 		$('#usersTable tbody').append(tr);
 		document.getElementById(buttonEditId).addEventListener("click", editUser);
@@ -926,11 +951,11 @@ function addCategoryTr(category){
 	let tdGpuCores = $('<td>' + category.numOfGpuCores + '</td>');
 	var buttonDelId = "del_" + category.name;
 	var buttonEditId = "edit_" + category.name;
-	let tdButtons = $('<td><button type="button" id = "' + buttonEditId + '" data-toggle="modal" class="btn btn-warning btn-rounded btn-sm my-0">Update</button><button type="button" id = "' + buttonDelId + '" class="btn btn-danger btn-rounded btn-sm my-0">Delete</button></td>');
+	let tdButtons = $('<td><button type="button" id = "' + buttonEditId + '" data-toggle="modal" class="btn btn-warning btn-rounded btn-sm my-0"><i class="fa fa-edit"></i></button><button type="button" id = "' + buttonDelId + '" class="btn btn-danger btn-rounded btn-sm my-0"><i class="fa fa-times" aria-hidden="true"></i></button></td>');
 
 	tr.append(tdName).append(tdCores).append(tdRam).append(tdGpuCores).append(tdButtons);
 	$('#vmcategory_table tbody').append(tr);
-	document.getElementById(buttonEditId).addEventListener("click", editCategory);
+	document.getElementById(buttonEditId).addEventListener("click", loadEditCategory);
 	document.getElementById(buttonDelId).addEventListener("click", deleteCategory);
 
 
@@ -1011,8 +1036,9 @@ function loadEditCategory() {
 	var splitted = button_id.split('_');
 	var name = splitted[1];
 	var obj = {};
+	oldName = name;
 	obj["name"] = name;
-	$("#div_center").load("html/add_organization.html", function() {
+	$("#div_center").load("html/add_category.html", function() {
 		
 		$.post({
 			url : 'rest/vmcategories/getByName',
@@ -1027,20 +1053,48 @@ function loadEditCategory() {
 			}
 	
 	});
-		$("#add_vmcategory").on("click", editCategory());
+		$("#add_vmcategory").on("click", editCategory);
+		
 		
 	});
 }
 
 function fillEditFieldsCategory(category) {
 	$("#cat_name").val(category.name);
+	$("#numOfCores").val(category.numberOfCores);
+	$("#ram").val(category.ram);
+	$("#gpu").val(category.numOfGpuCores);
 	$("#add_vmcategory").html("update")
-
-	
 }
 
 function editCategory() {
+	var obj = {};
+	obj["oldName"] = oldName;
+	obj["name"] = $("#cat_name").val();
+	obj["ram"] = $("#ram").val();
+	obj["gpu"] = $("#gpu").val();
+	obj["cores"] = $("#numOfCores").val();
 
+	$.post({
+		url : "rest/vmcategories/update",
+		contentType : 'application/json',
+		dataType : 'json',
+		data : JSON.stringify(obj),
+		success : function(data) {
+			if(data == "existError")
+			{
+				toastr.error("Category name already exists!");
+			}
+			else (data == "success")
+			{
+				toastr.success("Update was successful!");
+        		getCategories(); 
+			}
+		},
+		error: function(errorThrown ){
+			toastr.error( errorThrown );
+		}
+	});
 	
 }
 
@@ -1107,7 +1161,7 @@ function addDiskTr(disk){
 	}
 	var buttonDelId = "del_" + disk.name;
 	var buttonEditId = "edit_" + disk.name;
-	let tdButtons = $('<td><button type="button" id = "' + buttonEditId + '" data-toggle="modal" class="btn btn-warning btn-rounded btn-sm my-0">Update</button><button type="button" id = "' + buttonDelId + '" class="btn btn-danger btn-rounded btn-sm my-0">Delete</button></td>');
+	let tdButtons = $('<td><button type="button" id = "' + buttonEditId + '" data-toggle="modal" class="btn btn-warning btn-rounded btn-sm my-0"><i class="fa fa-edit"></i></button><button type="button" id = "' + buttonDelId + '" class="btn btn-danger btn-rounded btn-sm my-0"><i class="fa fa-times" aria-hidden="true"></i></button></td>');
 
 	tr.append(tdName).append(tdType).append(tdCapacity).append(tdOrganization).append(tdVM).append(tdButtons);
 	$('#disks_table tbody').append(tr);
@@ -1326,7 +1380,7 @@ function editDisk() {
 			}
 			else (data == "success")
 			{
-				toastr.success("You've successfully updated disk!");
+				toastr.success("Update was successful!");
         		getDisks(); 
 			}
 		},

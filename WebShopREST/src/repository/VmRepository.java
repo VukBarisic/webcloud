@@ -220,7 +220,7 @@ public class VmRepository {
 		
 		for (Activity a: vm.getActivities()) {
 			if (a.getDateTurnedOff() != null) {
-				System.out.println(a.getDateTurnedOn().until(a.getDateTurnedOff(), ChronoUnit.SECONDS));
+				System.out.println(a.getDateTurnedOn().until(a.getDateTurnedOff(), ChronoUnit.HOURS));
 			}
 		}
 
@@ -235,5 +235,27 @@ public class VmRepository {
 		}
 		return false;
 
+	}
+
+	public static void categoryUpdated(VMcategory category, String oldName) {
+		List<VirtualMachine> virtualMachines = getVirtualMachines();
+		boolean changed = false;
+		for (VirtualMachine vm: virtualMachines) {
+			if (vm.getvMcategory().getName().equals(oldName)) {
+				vm.setvMcategory(category);
+				changed = true;
+			}
+		}
+		if (changed) {
+		try {
+			mapper.writeValue(Paths.get(
+					"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\virtualmachines.json")
+					.toFile(), virtualMachines);
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		}
+		}
+		
 	}
 }

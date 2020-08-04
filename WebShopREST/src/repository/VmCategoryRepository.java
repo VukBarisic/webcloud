@@ -1,6 +1,7 @@
 package repository;
 
 import java.io.IOException;
+
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import model.VMcategory;
 import model.VirtualMachine;
 
@@ -110,4 +110,32 @@ public class VmCategoryRepository {
 		return null;
 
 	}
+
+	public static boolean updateCategory(HashMap<String, String> data) {
+		try {
+			ArrayList<VMcategory> categories = getVmCategories();
+			int ram = Integer.parseInt(data.get("ram"));
+			int gpu = Integer.parseInt(data.get("gpu"));
+			int cores = Integer.parseInt(data.get("cores"));
+			for (VMcategory c : categories) {
+				if (c.getName().equals(data.get("oldName"))) {
+					c.setRam(ram);
+					c.setNumberOfCores(cores);
+					c.setNumOfGpuCores(gpu);
+					c.setName(data.get("name"));
+					VmRepository.categoryUpdated(c, data.get("name"));
+					}
+				}
+
+			mapper.writeValue(Paths.get(
+					"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\vmcategories.json")
+					.toFile(), categories);
+			return true;
+		} catch (IOException e) {
+
+			e.printStackTrace();
+			return false;
+		}
+	}
+
 }

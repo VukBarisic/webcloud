@@ -1,1 +1,42 @@
-[{"email":"vukbarisic1996@gmail.com","password":"1","firstName":"Rack","lastName":"jackson","organization":"","role":"superadmin"},{"email":"v@gmail.com","password":"2","firstName":"Vuk","lastName":"Barisic","organization":"","role":"superadmin"},{"email":"alexbarisic@gmail.com","password":"1","firstName":"Aleksandra","lastName":"Barisic","organization":"Apple incorporated","role":"user"},{"email":"v@gmail.com","password":"PAdkaoms","firstName":"Vuk","lastName":"Degenek","organization":"Apple incorporated","role":"user"},{"email":"arsenewenger@gmail.com","password":"arsenal","firstName":"Arsene","lastName":"Wenger","organization":"amazon incorp","role":"admin"}]
+[
+	{
+		"email": "vukbarisic1996@gmail.com",
+		"password": "1",
+		"firstName": "Rack",
+		"lastName": "jackson",
+		"organization": "",
+		"role": "superadmin"
+	},
+	{
+		"email": "v@gmail.com",
+		"password": "2",
+		"firstName": "Vuk",
+		"lastName": "Barisic",
+		"organization": "",
+		"role": "superadmin"
+	},
+	{
+		"email": "alexbarisic@gmail.com",
+		"password": "1",
+		"firstName": "Aleksandra",
+		"lastName": "Barisic",
+		"organization": "Apple incorporated",
+		"role": "user"
+	},
+	{
+		"email": "v@gmail.com",
+		"password": "PAdkaoms",
+		"firstName": "Vuk",
+		"lastName": "Degenek",
+		"organization": "Apple incorporated",
+		"role": "user"
+	},
+	{
+		"email": "arsenewenger@gmail.com",
+		"password": "arsenal",
+		"firstName": "Arsene",
+		"lastName": "Wenger",
+		"organization": "amazon incorp",
+		"role": "admin"
+	}
+]
