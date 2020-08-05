@@ -149,4 +149,26 @@ public class DiskRepository {
 		return disks;
 	}
 
+	public static void organizationUpdated(String oldName, String newName) {
+		List<Disk> disks = getDisks();
+		boolean changed = false;
+		for (Disk d : disks) {
+			if (d.getOrganization().equals(oldName)) {
+				d.setOrganization(newName);
+				changed = true;
+			}
+		}
+		if (changed) {
+			try {
+				mapper.writeValue(Paths.get(
+						"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\disks.json")
+						.toFile(), disks);
+			} catch (IOException e) {
+
+				e.printStackTrace();
+			}
+		}
+
+	}
+
 }

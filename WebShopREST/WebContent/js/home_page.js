@@ -4,9 +4,9 @@ var oldName = "";
 var searchResults = [];
 var filterResults = [];
 
-$(document).ready(function() {
+document.addEventListener("DOMContentLoaded", function(){
 	loadHomePage();
-});
+	});
 
 function loadHomePage() {
 	loggedUser = getLoggedUser();
@@ -56,7 +56,6 @@ function fillMyProfileFields() {
 		$("#organization").val(loggedUser.organization);
 		$("#organization").prop( "disabled", true );
 	}
-	$("#add_vmcategory").html("update")
 }
 
 
@@ -273,7 +272,7 @@ function showOrganizations(organizations) {
 
 function addOrganizationTr(organization){
 	let tr = $('<tr class="text-center"></tr>');
-	let tdLogo = $('<td style="width:70%" class="w-25"><img style="width:100%;" class="img-responsive" src= imgs/' + organization.logo  + ' alt="Error loading"></td>');
+	let tdLogo = $('<td style="width:70%" class="w-25"><img style="width:100%;" class="img-responsive" src= imgs/' + organization.logo  + ' alt="Loading.."></td>');
 	let tdBroj = $('<td>' + organization.description + '</td>');
 	let tdIme = $('<td>' + organization.name + '</td>');
 	var buttonDelId = "del_" + organization.name;
@@ -375,7 +374,8 @@ function loadEditOrganization() {
 	var name = splitted[1];
 	var obj = {};
 	obj["name"] = name;
-	$("#div_center").load("html/add_organization.html", function() {
+	oldName = name;
+	$("#div_center").load("html/editOrganization.html", function() {
 		
 		$.post({
 			url : 'rest/organizations/getByName',
@@ -390,23 +390,78 @@ function loadEditOrganization() {
 			}
 	
 	});
-		$("#button_add_org").on("click", editOrganization());
+		$("#button_edit_org").off().on("click", editOrganization);
 		
 	});
 }
 
 function fillEditFieldsOrg(organization) {
 	$("#org_name").val(organization.name);
-	$("#button_add_org").html("update")
+	$("#org_desc").val(organization.description);
+	$("#img-upload").attr("src", "imgs/" + organization.logo);
 
-	
 }
 
 function editOrganization() {
+	var obj = {};
+	let fileUploaded = true;
+	obj["oldName"] = oldName;
+	obj["name"] = $("#org_name").val();
+	obj["description"] = $("#org_desc").val();
+	if ($("#org_image")[0].files.length == 0) {
+	    fileUploaded = false;
+	    obj["logo"] = "";
+	}
+	else {
+		var file = $("#org_image")[0].files[0];
+		obj["logo"] = obj["name"];
+	}
 
+	$.ajax({
+		async: false,
+		type: 'POST',
+		url : "rest/organizations/update",
+		contentType : 'application/json',
+		dataType : 'json',
+		data : JSON.stringify(obj),
+		success : function(data) {
+			if(data == "existError")
+			{
+				toastr.error("Organization name already exists!");
+			}
+			else if (data == "success" && fileUploaded)
+			{
+				$.post({
+					
+					url : "rest/organizations/uploadImage",
+			        contentType : "multipart/form-data",
+			        dataType: 'json',
+			        data : file,
+			        processData : false,
+			        success: function(response)
+			        {
+			        	if(response == "success")
+			        	{
+			        		toastr.success("You've successfully updated organization!");
+			        		getOrganizations();
+			        	}
+			        },
+					error: function(errorThrown){
+						toastr.error( errorThrown );
+					}
+				}); 
+			}
+			else if (data == "success") {
+				toastr.success("You've successfully updated organization!");
+        		getOrganizations();
+			}
+		},
+		error: function(errorThrown ){
+			toastr.error( errorThrown );
+		}
+	});
 	
 }
-
 function searchOrganizations() {
 	var obj = {};
 	obj["name"] = $("#search-input").val();
@@ -432,7 +487,6 @@ function getVirtualMachines() {
 		url : 'rest/vms/getAll',
 		dataType : 'json',
 		success : function(vms) {
-	
 			showVirtualMachines(vms);
 		},
 		error : function(errorThrown) {
@@ -846,13 +900,18 @@ function addUserTr(user){
 		tr.append(tdEmail).append(tdFirstName).append(tdLastName).append(tdOrg).append(tdButtons);
 		$('#usersTable tbody').append(tr);
 	}
+	else if (user.role == "superadmin") {
+		tdButtons = $('<td>superadmin</td>');
+		tr.append(tdEmail).append(tdFirstName).append(tdLastName).append(tdOrg).append(tdButtons);
+		$('#usersTable tbody').append(tr);
+	}
 	else{
 		var buttonDelId = "deluser_" + user.email;
 		var buttonEditId = "edituser_" + user.email;
 		let tdButtons = $('<td><button type="button" id = "' + buttonEditId + '" data-toggle="modal" class="btn btn-warning btn-rounded btn-sm my-0"><i class="fa fa-edit"></i></button><button type="button" id = "' + buttonDelId + '" class="btn btn-danger btn-rounded btn-sm my-0"><i class="fa fa-times" aria-hidden="true"></i></button></td>');
 		tr.append(tdEmail).append(tdFirstName).append(tdLastName).append(tdOrg).append(tdButtons);
 		$('#usersTable tbody').append(tr);
-		document.getElementById(buttonEditId).addEventListener("click", editUser);
+		document.getElementById(buttonEditId).addEventListener("click", loadEditUser);
 		document.getElementById(buttonDelId).addEventListener("click", deleteUser);
 	}
 	}
@@ -1005,7 +1064,105 @@ function deleteUser() {
 	});
 }
 
+function loadEditUser() {
+	var button_id = this.id;
+	var splitted = button_id.split('_');
+	var email = splitted[1];
+	var obj = {};
+	oldName = email;
+	obj["email"] = email;
+	$("#div_center").load("html/editUser.html", function() {
+		
+		$.post({
+			url : 'rest/users/getByEmail',
+			contentType : 'application/json',
+			dataType : 'json',
+			data : JSON.stringify(obj),
+			success : function(user) {
+				fillUserEditFields(user);
+			},
+			error : function(errorThrown) {
+				toastr.error(errorThrown);
+			}
+	
+	});
+		$("#editUser").on("click", editUser);
+		
+		
+	});
+}
+
+
+function fillUserEditFields(user) {
+	$("#validationFirst").hide();
+	$("#validationLast").hide();
+	$("#validationEmail").hide();
+	$("#validationOrg").hide();
+	$("#firstName").val(user.firstName);
+	$("#lastName").val(user.lastName);
+	$("#email").val(user.email);
+	$("#organization").val(user.organization);
+	$("#organization").prop( "disabled", true );
+}
+
+
 function editUser() {
+	var obj = {};
+	obj["oldEmail"] = oldName;
+	obj["email"] = $("#email").val();
+	obj["firstName"] = $('#firstName').val();
+	obj["lastName"] = $("#lastName").val();
+	obj["password"] = $('#password').val();
+	obj["confirm_password"] = $('#confirm_password').val();
+	let validate = true;
+	if ($("#firstName").val() == "") {
+		 $("#validationFirst").show();
+		 $("#firstName").css("border-color","red");
+		 validate = false;
+	}
+	else{
+		$("#validationFirst").hide();
+		$("#firstName").css("border-color","#ced4da");
+	}
+	if ($("#lastName").val() == "") {
+		 $("#validationLast").show();
+		 $("#lastName").css("border-color","red");
+		 validate = false;
+	}
+	else {
+		$("#validationLast").hide();
+		$("#lastName").css("border-color","#ced4da");
+	}
+	if ($("#email").val() == "") {
+		 $("#validationEmail").show();
+		 $("#email").css("border-color","red");
+		 validate = false;
+	}
+	else {
+		$("#validationEmail").hide();
+		$("#email").css("border-color","#ced4da");
+	}
+	if (!validate) {
+		toastr.error("All fields must be filled!");
+		return false;
+	}
+
+	
+	$.ajax({
+		async: false,
+		type: 'POST',
+		url : "rest/users/updateUser",
+		contentType : 'application/json',
+		dataType : 'json',
+		data : JSON.stringify(obj),
+		success : function(user) {
+				toastr.success("You've successfully updated user!");
+        		getUsers(); 
+		},
+		error: function(errorThrown ){
+			toastr.error( errorThrown );
+		}
+	});
    
 }
 

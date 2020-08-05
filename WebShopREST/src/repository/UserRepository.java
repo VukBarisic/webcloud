@@ -1,6 +1,7 @@
 package repository;
 
 import java.io.IOException;
+
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,10 +10,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import model.Disk;
 import model.User;
-import model.VMcategory;
-import sun.security.action.GetLongAction;
 
 public class UserRepository {
 
@@ -51,17 +49,12 @@ public class UserRepository {
 	}
 
 	public static User findByEmail(String email) {
-
-		try {
-			List<User> users = getUsers();
-			for (User user : users) {
-				if (user.getEmail().equals(email)) {
-					return user;
-				}
+		List<User> users = getUsers();
+		for (User user : users) {
+			if (user.getEmail().equals(email)) {
+				return user;
 			}
 
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 		return null;
 	}
@@ -140,6 +133,54 @@ public class UserRepository {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public static void organizationUpdated(String oldName, String newName) {
+		List<User> users = getUsers();
+		boolean changed = false;
+		for (User user : users) {
+			if (user.getOrganization().equals(oldName)) {
+				user.setOrganization(newName);
+				changed = true;
+			}
+		}
+		if (changed) {
+			try {
+				mapper.writeValue(Paths.get(
+						"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\users.json")
+						.toFile(), users);
+			} catch (IOException e) {
+
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+	public static boolean updateUser(HashMap<String, String> data) {
+		ArrayList<User> users = getUsers();
+		String email = data.get("email");
+		String oldEmail = data.get("oldEmail");
+		String firstName = data.get("firstName");
+		String lastName = data.get("lastName");
+		for (User user : users) {
+			if (user.getEmail().equals(oldEmail)) {
+				user.setEmail(email);
+				user.setFirstName(firstName);
+				user.setLastName(lastName);
+				break;
+			}
+		}
+		try {
+			mapper.writeValue(Paths.get(
+					"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\users.json")
+					.toFile(), users);
+			return true;
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 }

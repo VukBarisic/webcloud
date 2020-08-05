@@ -12,8 +12,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import helpers.HelperMethods;
 import model.User;
+import model.VMcategory;
 import repository.DiskRepository;
 import repository.UserRepository;
+import repository.VmCategoryRepository;
 
 @Path("/users")
 public class UserService {
@@ -116,4 +118,32 @@ public class UserService {
 		request.getSession().setAttribute("user", user);
 		return Response.status(200).entity(user).build();
 	}
+	
+	@POST
+	@Path("/getByEmail")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getByEmail(HashMap<String, String> data) {
+		User user = UserRepository.findByEmail(data.get("email"));
+		if (user == null)
+			return Response.status(400).entity("Error getting user").build();
+		return Response.status(200).entity(user).build();
+	}
+	
+	@POST
+	@Path("/updateUser")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response updateCategory(HashMap<String, String> data) {
+		if (!data.get("oldEmail").equals(data.get("email"))
+				&& !UserRepository.isUniqueEmail(data.get("email"))) {
+			return Response.status(200).entity("existError").build();
+		}
+		boolean success = UserRepository.updateUser(data);
+		if (!success) {
+			return Response.status(400).entity("Error updating user").build();
+		}
+		return Response.status(200).entity(HelperMethods.GetJsonValue(success)).build();
+	}
+	
 }

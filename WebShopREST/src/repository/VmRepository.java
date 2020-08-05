@@ -1,6 +1,7 @@
 package repository;
 
 import java.io.IOException;
+
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -14,10 +15,8 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javafx.geometry.HPos;
 import model.Activity;
 import model.Disk;
-import model.DiskType;
 import model.Organization;
 import model.VMcategory;
 import model.VirtualMachine;
@@ -218,8 +217,8 @@ public class VmRepository {
 		List<VirtualMachine> vms = virtualMachines.stream()
 				.map(virtualMachine -> virtualMachine.getName().equals(data.get("name")) ? vm : virtualMachine)
 				.collect(Collectors.toList());
-		
-		for (Activity a: vm.getActivities()) {
+
+		for (Activity a : vm.getActivities()) {
 			if (a.getDateTurnedOff() != null) {
 				System.out.println(a.getDateTurnedOn().until(a.getDateTurnedOff(), ChronoUnit.HOURS));
 			}
@@ -241,23 +240,23 @@ public class VmRepository {
 	public static void categoryUpdated(VMcategory category, String oldName) {
 		List<VirtualMachine> virtualMachines = getVirtualMachines();
 		boolean changed = false;
-		for (VirtualMachine vm: virtualMachines) {
+		for (VirtualMachine vm : virtualMachines) {
 			if (vm.getvMcategory().getName().equals(oldName)) {
 				vm.setvMcategory(category);
 				changed = true;
 			}
 		}
 		if (changed) {
-		try {
-			mapper.writeValue(Paths.get(
-					"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\virtualmachines.json")
-					.toFile(), virtualMachines);
-		} catch (IOException e) {
+			try {
+				mapper.writeValue(Paths.get(
+						"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\virtualmachines.json")
+						.toFile(), virtualMachines);
+			} catch (IOException e) {
 
-			e.printStackTrace();
+				e.printStackTrace();
+			}
 		}
-		}
-		
+
 	}
 
 	public static boolean updateVm(HashMap<String, String> data) {
@@ -287,4 +286,29 @@ public class VmRepository {
 			return false;
 		}
 	}
+
+	public static void organizationUpdated(String oldName, String newName) {
+		List<VirtualMachine> virtualMachines = getVirtualMachines();
+		boolean changed = false;
+		for (VirtualMachine vm : virtualMachines) {
+			if (vm.getOrganization().equals(oldName)) {
+				vm.setOrganization(newName);
+				String vmName = vm.getName().split("\\.")[0] + "." + vm.getOrganization();
+				vm.setName(vmName);
+				changed = true;
+			}
+		}
+		if (changed) {
+			try {
+				mapper.writeValue(Paths.get(
+						"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\virtualmachines.json")
+						.toFile(), virtualMachines);
+			} catch (IOException e) {
+
+				e.printStackTrace();
+			}
+		}
+
+	}
+
 }

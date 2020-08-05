@@ -1,6 +1,7 @@
 package services;
 
 import java.io.File;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,9 +9,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import javax.annotation.PostConstruct;
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -29,16 +27,7 @@ import repository.OrganizationRepository;
 public class OrganizationService {
 
 	@Context
-	ServletContext ctx;
-	@Context
 	HttpServletRequest request;
-
-	@PostConstruct
-	public void init() {
-		if (ctx.getAttribute("organizations") == null) {
-			ctx.setAttribute("organizations", OrganizationRepository.getOrganizations());
-		}
-	}
 
 	@POST
 	@Path("/add")
@@ -49,12 +38,11 @@ public class OrganizationService {
 			return Response.status(200).entity("existError").build();
 		}
 		String organizationJson = OrganizationRepository.saveOrganization(data.get("name"), data.get("description"));
-		request.getSession().setAttribute("organisation", data.get("name"));
+		request.getSession().setAttribute("organization", data.get("name"));
 		if (organizationJson == null) {
 			return Response.status(400).entity("Error adding organization").build();
 		}
-		ctx.setAttribute("organizations", OrganizationRepository.getOrganizations());
-		return Response.status(200).entity(HelperMethods.GetJsonValue(organizationJson)).build();
+		return Response.status(200).entity(organizationJson).build();
 
 	}
 
@@ -63,7 +51,7 @@ public class OrganizationService {
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Produces(MediaType.APPLICATION_JSON)
 	public String uploadImage(InputStream is) throws IOException {
-		String name = (String) request.getSession().getAttribute("organisation");
+		String name = (String) request.getSession().getAttribute("organization");
 		String imageName = name.replaceAll("\\s", "") + ".jpg";
 
 		int read = 0;
@@ -137,5 +125,21 @@ public class OrganizationService {
 		if (organization == null) return Response.status(400).entity("Error getting organization").build();
 		return Response.status(200).entity(organization).build();
 
+	}
+	
+	@POST
+	@Path("/update")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response updateOrganization(HashMap<String, String> data) {
+		if (!data.get("name").equals(data.get("oldName")) && !OrganizationRepository.isUniqueOrg(data.get("name"))) {
+			return Response.status(200).entity("existError").build();
+		}
+		boolean condition = !OrganizationRepository.updateOrganization(data);
+		if (condition) {
+			return Response.status(400).entity("Error updating organization").build();
+		}
+		request.getSession().setAttribute("organization", data.get("name"));
+		return Response.status(200).entity(HelperMethods.GetJsonValue("success")).build();
 	}
 }
