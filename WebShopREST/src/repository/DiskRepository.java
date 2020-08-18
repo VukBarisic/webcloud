@@ -155,6 +155,7 @@ public class DiskRepository {
 		for (Disk d : disks) {
 			if (d.getOrganization().equals(oldName)) {
 				d.setOrganization(newName);
+				d.setVirtualMachine(d.getVirtualMachine().split("\\.")[0] + "." + newName);
 				changed = true;
 			}
 		}
@@ -169,6 +170,13 @@ public class DiskRepository {
 			}
 		}
 
+	}
+	
+	public static List<Disk> getDisksByCompany(String companyName) {
+		List<Disk> disks = getDisks().stream()
+				.filter(disk -> disk.getOrganization().equals(companyName))
+				.collect(Collectors.toList());
+		return disks;
 	}
 
 }

@@ -15,7 +15,9 @@ import javax.ws.rs.core.Response;
 
 import helpers.HelperMethods;
 import model.Disk;
+import model.User;
 import repository.DiskRepository;
+import repository.UserRepository;
 import repository.VmRepository;
 
 
@@ -31,7 +33,7 @@ public class DiskService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addDisk(HashMap<String, String> data) {
 		if (!DiskRepository.isUniqueDisk(data.get("name"))) {
-			return Response.status(200).entity("existError").build();
+			return Response.status(200).entity(HelperMethods.GetJsonValue("existError")).build();
 		}
 		boolean success = DiskRepository.saveDisk(data);
 		if (!success) {
@@ -47,7 +49,7 @@ public class DiskService {
 	public Response getDisks() {
 		ArrayList<Disk> disks = DiskRepository.getDisks();
 
-		return Response.status(200).entity(disks).build();
+		return Response.status(200).entity(HelperMethods.GetJsonValue(disks)).build();
 
 	}
 
@@ -81,7 +83,7 @@ public class DiskService {
 	public Response getbyName(HashMap<String, String> data) {
 		Disk disk = DiskRepository.findByName(data.get("name"));
 		if (disk == null)
-			return Response.status(400).entity("Error getting disk").build();
+			return Response.status(400).entity(HelperMethods.GetJsonValue("Error getting disk")).build();
 		return Response.status(200).entity(disk).build();
 
 	}
@@ -109,4 +111,18 @@ public class DiskService {
 	public Response filterDisks(HashMap<String, String> data) {
 		return Response.status(200).entity(DiskRepository.filterDisks(data)).build();
 	}
+	
+	@GET
+	@Path("/getByOrganization")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getbyOrganization(HashMap<String, String> data) {
+		
+		User user = (User) request.getSession().getAttribute("user");
+
+
+		return Response.status(200).entity(DiskRepository.getDisksByCompany(user.getOrganization())).build();
+
+	}
+	
+	
 }

@@ -16,6 +16,7 @@ import model.VMcategory;
 import repository.DiskRepository;
 import repository.UserRepository;
 import repository.VmCategoryRepository;
+import repository.VmRepository;
 
 @Path("/users")
 public class UserService {
@@ -144,6 +145,17 @@ public class UserService {
 			return Response.status(400).entity("Error updating user").build();
 		}
 		return Response.status(200).entity(HelperMethods.GetJsonValue(success)).build();
+	}
+	
+	@GET
+	@Path("/getByOrganization")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getbyOrganization() {
+		
+		User user = (User) request.getSession().getAttribute("user");
+
+		return Response.status(200).entity(UserRepository.getbyOrganization(user.getOrganization())).build();
+
 	}
 	
 }

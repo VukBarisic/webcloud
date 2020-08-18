@@ -7,10 +7,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import model.User;
+import model.VirtualMachine;
 
 public class UserRepository {
 
@@ -181,6 +183,13 @@ public class UserRepository {
 			e.printStackTrace();
 		}
 		return false;
+	}
+
+	public static List<User> getbyOrganization(String organization) {
+		List<User> users = getUsers().stream()
+				.filter(user -> user.getOrganization().equals(organization))
+				.collect(Collectors.toList());
+		return users;
 	}
 
 }

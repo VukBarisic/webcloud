@@ -14,6 +14,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import helpers.HelperMethods;
+import model.User;
 import model.VirtualMachine;
 import repository.DiskRepository;
 import repository.VmRepository;
@@ -80,6 +81,17 @@ public class VirtualMachineService {
 	public Response getbyOrgName(HashMap<String, String> data) {
 
 		return Response.status(200).entity(VmRepository.getVmNamesByCompany(data.get("organization"))).build();
+
+	}
+	@GET
+	@Path("/getByOrganization")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getbyOrganization(HashMap<String, String> data) {
+		
+		User user = (User) request.getSession().getAttribute("user");
+
+
+		return Response.status(200).entity(VmRepository.getVirtualMachinesByCompany(user.getOrganization())).build();
 
 	}
 	

@@ -5,6 +5,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -13,7 +19,12 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import javafx.util.converter.LocalDateTimeStringConverter;
+import model.Activity;
+import model.Disk;
+import model.DiskType;
 import model.Organization;
+import model.VirtualMachine;
 
 public class OrganizationRepository {
 
@@ -185,5 +196,72 @@ public class OrganizationRepository {
 			e.printStackTrace();
 			return false;
 		}
+	}
+
+	public static double calculateMonthlyBill(String organization, String selectedMonth) {
+		List<VirtualMachine> virtualMachines = VmRepository.getVirtualMachinesByCompany(organization);
+		List<Disk> disks = DiskRepository.getDisksByCompany(organization);
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+		LocalDateTime startOfMonth = LocalDateTime.parse(selectedMonth, formatter);
+		LocalDateTime endOfMonth = startOfMonth.with(TemporalAdjusters.firstDayOfNextMonth());
+		LocalDateTime today = LocalDateTime.now();
+
+		double bill = 0;
+		for (Disk d : disks) {
+			if (d.getDiskType() == DiskType.HDD) {
+				bill += d.getCapacity() * 0.1;
+			} else if (d.getDiskType() == DiskType.SSD) {
+				bill += d.getCapacity() * 0.3;
+			}
+		}
+		int hours = 0;
+		for (VirtualMachine vm : virtualMachines) {
+			for (Activity a : vm.getActivities()) {
+				if (startOfMonth.getMonth().equals(today.getMonth())) { //u trenutnom mesecu
+					if (a.getDateTurnedOn().isAfter(startOfMonth)) {
+						if (a.getDateTurnedOff() == null) {
+							hours += a.getDateTurnedOn().until(today, ChronoUnit.HOURS);//pocetak u izabranom mesecu, nije iskljucena 22n
+						} else {
+							hours += a.getDateTurnedOn().until(a.getDateTurnedOff(), ChronoUnit.HOURS);//pocetak u izabranom mesecu, iskljucena 222
+						}
+					} else {
+						if (a.getDateTurnedOff() == null) {
+							hours += startOfMonth.until(today, ChronoUnit.HOURS); //pocetak u prethodnim mesecima, nije iskljucena 12n
+						} else if (a.getDateTurnedOff().getMonth().equals(startOfMonth.getMonth())) {
+							hours += startOfMonth.until(a.getDateTurnedOff(), ChronoUnit.HOURS); //pocetak u prethodnim mesecima, iskljucena u izabranom 122
+						}
+					}
+				} else {
+					if (a.getDateTurnedOn().getMonth().equals(startOfMonth.getMonth())) {
+						if (a.getDateTurnedOff() == null) {
+							hours += a.getDateTurnedOn().until(endOfMonth, ChronoUnit.HOURS); //ukljucena u izabranom mesecu nije iskljucena 22n
+						} else {
+							if (a.getDateTurnedOff().isAfter(endOfMonth)) {
+								hours += a.getDateTurnedOn().until(endOfMonth, ChronoUnit.HOURS); //ukljucena u izabranom mesecu, iskljucena nakon tog meseca 223
+							} else {
+								hours += a.getDateTurnedOn().until(a.getDateTurnedOff(), ChronoUnit.HOURS);//ukljucena u izabranom mesecu, iskljucena u izabranom mesecu 222
+
+							}
+
+						}
+					} else if (a.getDateTurnedOff() == null && a.getDateTurnedOn().isBefore(startOfMonth)) { //ukljucena u prethodnim mesecima nije iskljucena 12n
+						hours += startOfMonth.until(endOfMonth, ChronoUnit.HOURS);
+					} else if (a.getDateTurnedOn().isBefore(startOfMonth) 
+							&& a.getDateTurnedOff().getMonth().equals(startOfMonth.getMonth())) { // ukljucena u prethodnim mesecima, sikljucena u odabranom mesecu 122
+						hours += startOfMonth.until(a.getDateTurnedOff(), ChronoUnit.HOURS);
+					} else if (a.getDateTurnedOn().isBefore(startOfMonth) && a.getDateTurnedOff().isAfter(endOfMonth)) { // ukljucena u prethodnom mesecima, iskljucena nakon odabranog meseca123 
+						hours += startOfMonth.until(endOfMonth, ChronoUnit.HOURS);
+					}
+
+				}
+
+			}
+			bill += (vm.getvMcategory().getRam() * 15 + vm.getvMcategory().getNumberOfCores() * 25
+					+ vm.getvMcategory().getNumOfGpuCores()) * hours / 720;
+			hours = 0;
+		}
+
+		return bill;
+
 	}
 }

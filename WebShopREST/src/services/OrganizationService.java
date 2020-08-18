@@ -142,4 +142,17 @@ public class OrganizationService {
 		request.getSession().setAttribute("organization", data.get("name"));
 		return Response.status(200).entity(HelperMethods.GetJsonValue("success")).build();
 	}
+	@POST
+	@Path("/calculatePrice")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response calculateMonthlyBill(HashMap<String, String> data) {
+		double price = 0;
+		price = OrganizationRepository.calculateMonthlyBill(data.get("organization"), data.get("selectedMonth"));
+		
+		return Response.status(200).entity(price).build();
+		
+		
+	}
+	
 }

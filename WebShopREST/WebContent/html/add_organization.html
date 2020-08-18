@@ -65,9 +65,8 @@ $(document).on('change', '.btn-file :file', function() {
 		<div class="col-md-6">
 			<form>
 				<div class="form-group">
-					<label for="vmname">Name</label> <input type="text"
-						class="form-control" id="org_name" placeholder="First name"
-						required>
+					<label for="org_name">Name</label> <input type="text"
+						class="form-control" id="org_name" placeholder="Organization name">
 					<p>
 						<small id="validationName" class="form-text text-muted">Field
 							can't be empty</small>
@@ -76,7 +75,7 @@ $(document).on('change', '.btn-file :file', function() {
 				<div class="form-group">
 					<label for="org_desc">Description</label>
 					<textarea class="form-control" id="org_desc"
-						placeholder="First name" required> </textarea>
+					placeholder="description"></textarea>
 					<p>
 						<small id="validationDesc" class="form-text text-muted">Field
 							can't be empty</small>
@@ -84,12 +83,16 @@ $(document).on('change', '.btn-file :file', function() {
 				</div>
 
 				<div class="form-group">
-					<label>Upload Image</label> <input type="file" id="org_image"
+					<label id = "uploadlabel">Upload Image</label> <input type="file" id="org_image"
 						accept="image/*"> <img id='img-upload' />
 				</div>
+				<p>
+					<small id="validationFile" class="form-text text-muted">File
+						has to be uploaded </small>
+				</p>
 				<div class="text-center">
-				<button type = "button" id="button_add_org" class="btn btn-primary">Add
-					Organization</button>
+					<button type="button" id="button_add_org" class="btn btn-primary">Add
+						Organization</button>
 				</div>
 			</form>
 		</div>

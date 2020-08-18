@@ -15,9 +15,13 @@ function loadHomePage() {
 		loadLoginPage();
 	} else {
 		$("#index_nav").show();
-		getVirtualMachines();
 		var x = document.getElementById("loggedUserDrop");
 		x.innerHTML = loggedUser.email;
+		$("#logout").on("click", logout);
+		$("#myProfile").on("click", loadMyProfile);
+		byUserType();
+		/*
+		getVirtualMachines();
 		$("#button_login").on("click", login);
 		$("#home").on("click", getVirtualMachines);
 		$("#organizations").on("click", getOrganizations);
@@ -25,11 +29,88 @@ function loadHomePage() {
 		$("#disks").on("click", getDisks);
 		$("#vmCategories").on("click", getCategories);
 		$("#myProfile").on("click", loadMyProfile);
-		$("#logout").on("click", logout);
-
+		*/
 
 	}
 
+}
+
+function byUserType() {
+	if (loggedUser.role == 'superadmin') {
+		$("#myOrganization").hide();
+		$("#monthlyReport").hide();
+		$("#vmCategories").show();
+		$("#organizations").show();
+		$("#vmCategories").show();
+		$("#users").show();
+		getVirtualMachines();
+		$("#home").on("click", getVirtualMachines);
+		$("#organizations").on("click", getOrganizations);
+		$("#users").on("click", getUsers);
+		$("#disks").on("click", getDisks);
+		$("#vmCategories").on("click", getCategories);
+	}
+	else if (loggedUser.role == 'admin') {
+		$("#vmCategories").hide();
+		$("#organizations").hide();
+		$("#myOrganization").show();
+		$("#monthlyReport").show();
+		getVirtualMachinesByOrganization();
+		$("#home").on("click", getVirtualMachinesByOrganization);
+		$("#monthlyReport").on("click", loadMonthlyReport);
+		$("#myOrganization").on("click", loadEditOrganization);
+		$("#users").on("click", getUsersByOrganization);
+		$("#disks").on("click", getDisksByOrganization);
+		
+		
+	}
+	else {
+		$("#myOrganization").hide();
+		$("#organizations").hide();
+		$("#users").hide();
+		$("#vmCategories").hide();
+		$("#monthlyReport").hide();
+		getVirtualMachinesByOrganization();
+		$("#disks").on("click", getDisksByOrganization);
+		$("#home").on("click", getVirtualMachinesByOrganization);
+
+	}
+}
+
+function loadMonthlyReport(){
+	$("#div_center").load("html/monthreport.html", function() {
+		$('#monthPicker').datepicker({
+			minViewMode:'months',
+			autoclose: true,
+			endDate: new Date(),
+			orientation: "top",
+	});
+		$("#calculatePrice").on("click", calculatePrice);
+
+		
+	});
+
+}
+
+function calculatePrice(){
+	var obj = {};
+	obj["selectedMonth"] = "01/" + $("#monthPicker").val() + " 00:00:00";
+	obj["organization"] = loggedUser.organization;
+
+	
+	$.post({
+		url : "rest/organizations/calculatePrice",
+		contentType : 'application/json',
+		dataType : 'json',
+		data : JSON.stringify(obj),
+		success : function(price) {
+			$("#div_center").append("<p>The price for " + $("#monthPicker").val() + " is " + price + "$.</p>");
+		},
+		error: function(errorThrown ){
+			toastr.error( errorThrown );
+		}
+	});
+	
 }
 
 function loadMyProfile() {
@@ -123,9 +204,7 @@ function editMyProfile() {
 	}
 
 	
-	$.ajax({
-		async: false,
-		type: 'POST',
+	$.post({
 		url : "rest/users/updateMyProfile",
 		contentType : 'application/json',
 		dataType : 'json',
@@ -171,10 +250,8 @@ function login() {
 		submit = false;
 	}
 	if (submit) {
-		$.ajax({
-			async : false,
+		$.post({
 			url : "rest/users/login",
-			type : 'POST',
 			contentType : 'application/json',
 			dataType : 'json',
 			data : JSON.stringify(obj),
@@ -210,8 +287,8 @@ function getLoggedUser() {
 			toastr.error(errorThrown);
 		}
 	});
-
 	return user;
+
 }
 
 function logout() {
@@ -254,6 +331,8 @@ function getOrganizations() {
 }
 
 function showOrganizations(organizations) {
+	$("#search-input").show();
+	$("#search-button").show();
 	if (organizations.length > 0) {
 		$("#div_center").load("html/organizations.html", function() {
 			for (let organization of organizations) {
@@ -290,6 +369,9 @@ function addOrganizationTr(organization){
 function loadAddOrganization() {
 	$("#div_center").load("html/add_organization.html", function() {
 		$("#button_add_org").on("click", addOrganization);
+		$("#validationName").hide();
+		$("#validationDesc").hide();
+		$("#validationFile").hide();
 	});
 }
 
@@ -300,12 +382,43 @@ function addOrganization() {
 	var obj = {};
 	obj["name"] = $("#org_name").val();
 	obj["description"] = $('#org_desc').val();
-	// var file = $('#org_image').prop('files');
 	var file = $("#org_image")[0].files[0];
+	let validate = true;
+
+	if (obj["name"] == "") {
+		 $("#validationName").show();
+		 $("#org_name").css("border-color","red");
+		 validate = false;
+	}
+	else{
+		$("#validationName").hide();
+		$("#org_name").css("border-color","#ced4da");
+	}
+	if (obj["description"] == "") {
+		 $("#validationDesc").show();
+		 $("#org_desc").css("border","1px solid red");
+		 validate = false;
+	}
+	else {
+		$("#validationDesc").hide();
+		$("#org_desc").addClass('redBorder');
+	}
+	if (file == undefined) {
+		 $("#validationFile").show();
+		 $("#uploadlabel").css("border-color","red");
+		 validate = false;
+	}
+	else {
+		$("#validationFile").hide();
+		$("#uploadlabel").css("border-color","#ced4da");
+	}
+
+	if (!validate) {
+		toastr.error("All fields must be filled!");
+		return false;
+	}
 	
-	$.ajax({
-		async: false,
-		type: 'POST',
+	$.post({
 		url : "rest/organizations/add",
 		contentType : 'application/json',
 		dataType : 'json',
@@ -317,9 +430,7 @@ function addOrganization() {
 			}
 			else (data == "success")
 			{
-				$.ajax({
-					async: false,
-					type: 'POST',
+				$.post({
 					url : "rest/organizations/uploadImage",
 			        contentType : "multipart/form-data",
 			        dataType: 'json',
@@ -352,10 +463,8 @@ function deleteOrganization() {
 	var name = splitted[1];
 	var obj = {};
 	obj["name"] = name;
-	$.ajax({
-		async : false,
+	$.post({
 		url : 'rest/organizations/delete',
-		type : 'POST',
 		contentType : 'application/json',
 		dataType : 'json',
 		data : JSON.stringify(obj),
@@ -373,8 +482,16 @@ function loadEditOrganization() {
 	var splitted = button_id.split('_');
 	var name = splitted[1];
 	var obj = {};
-	obj["name"] = name;
-	oldName = name;
+	if (loggedUser.role == "superadmin") {
+		obj["name"] = name;
+		oldName = name;
+	}
+	else {
+		obj["name"] = loggedUser.organization;
+		oldName = loggedUser.organization;
+	}
+	
+	
 	$("#div_center").load("html/editOrganization.html", function() {
 		
 		$.post({
@@ -399,12 +516,16 @@ function fillEditFieldsOrg(organization) {
 	$("#org_name").val(organization.name);
 	$("#org_desc").val(organization.description);
 	$("#img-upload").attr("src", "imgs/" + organization.logo);
+	$("#validationName").hide();
+	$("#validationDesc").hide();
+	$("#validationFile").hide();
 
 }
 
 function editOrganization() {
 	var obj = {};
 	let fileUploaded = true;
+	var file;
 	obj["oldName"] = oldName;
 	obj["name"] = $("#org_name").val();
 	obj["description"] = $("#org_desc").val();
@@ -413,13 +534,37 @@ function editOrganization() {
 	    obj["logo"] = "";
 	}
 	else {
-		var file = $("#org_image")[0].files[0];
+		file = $("#org_image")[0].files[0];
 		obj["logo"] = obj["name"];
 	}
+	let validate = true;
 
-	$.ajax({
-		async: false,
-		type: 'POST',
+	if (obj["name"] == "") {
+		 $("#validationName").show();
+		 $("#org_name").css("border-color","red");
+		 validate = false;
+	}
+	else{
+		$("#validationName").hide();
+		$("#org_name").css("border-color","#ced4da");
+	}
+	if (obj["description"] == "") {
+		 $("#validationDesc").show();
+		 $("#org_desc").css("border","1px solid red");
+		 validate = false;
+	}
+	else {
+		$("#validationDesc").hide();
+		$("#org_desc").addClass("border","#ced4da");
+	}
+
+	if (!validate) {
+		toastr.error("All fields must be filled!");
+		return false;
+	}
+	
+
+	$.post({
 		url : "rest/organizations/update",
 		contentType : 'application/json',
 		dataType : 'json',
@@ -465,9 +610,12 @@ function editOrganization() {
 function searchOrganizations() {
 	var obj = {};
 	obj["name"] = $("#search-input").val();
-	$.ajax({
+	if (obj["name"] == "") {
+		toastr.error("Search input can't be empty");
+		return false;
+	}
+	$.post({
 		url : 'rest/organizations/search',
-		type : 'POST',
 		contentType : 'application/json',
 		dataType : 'json',
 		data : JSON.stringify(obj),
@@ -496,6 +644,8 @@ function getVirtualMachines() {
 }
 
 function showVirtualMachines(virtualMachines){
+	$("#search-input").show();
+	$("#search-button").show();
 	if (virtualMachines.length > 0) {
 		$("#div_center").load("html/virtualmachines.html", function() {
 			for (let vm of virtualMachines) {
@@ -533,21 +683,30 @@ function addVirtualMachineTr(virtualMachine){
 function loadAddVm() {
 	
 	$("#div_center").load("html/add_vm.html", function() {
+		$("#validationName").hide();
+		$("#validationCat").hide();
+		$("#validationOrg").hide();
 		$("#add_vm").on("click", addVirtualMachine);
 		var options = [];
-		$.get({
-			url : 'rest/organizations/getAllNames',
-			dataType : 'json',
-			success : function(organizationNames) {
-				var len = organizationNames.length;
-				$("#selectOrganization").empty();
-				$('#selectOrganization').append("<option value='"+ "" +"'>Select value</option>");
-                for( var i = 0; i<len; i++){
-                    var org = organizationNames[i];
-                    $('#selectOrganization').append("<option value='"+org+"'>"+org+"</option>");
-                }
-			}
-		});
+		if (loggedUser.role == 'superadmin') {
+			$.get({
+				url : 'rest/organizations/getAllNames',
+				dataType : 'json',
+				success : function(organizationNames) {
+					var len = organizationNames.length;
+					$("#selectOrganization").empty();
+					$('#selectOrganization').append("<option value='"+ "" +"'>Select value</option>");
+	                for( var i = 0; i<len; i++){
+	                    var org = organizationNames[i];
+	                    $('#selectOrganization').append("<option value='"+org+"'>"+org+"</option>");
+	                }
+				}
+			});
+		}
+		else {
+			$("#organizationDiv").hide();
+			$('#selectCategory').css("width", 354);
+		}
 		options = [];
 		$.get({
 			url : 'rest/vmcategories/getAllNames',
@@ -564,7 +723,6 @@ function loadAddVm() {
 		});
 	});	
 
-	
 }
 $(document).on("change", "#selectCategory", function(){
 	var obj = {};
@@ -628,9 +786,7 @@ function addVirtualMachine() {
 	}
 
 	
-	$.ajax({
-		async: false,
-		type: 'POST',
+	$.post({
 		url : "rest/vms/add",
 		contentType : 'application/json',
 		dataType : 'json',
@@ -681,6 +837,9 @@ function loadEditVm() {
 }
 
 function fillEditFieldsVm(vm) {
+	$("#validationName").hide();
+	$("#validationCat").hide();
+	$("#validationOrg").hide();
 	$("#vmname").val(vm.name.split(".")[0]);
 	$("#selectCategory").val(vm.category);
 	$("#organization").val(vm.organization)
@@ -714,9 +873,27 @@ function fillEditFieldsVm(vm) {
 function editVm(){
 	var obj = {};
 	obj["oldName"] = oldName;
-	obj["name"] = $("#vmname").val() + "." + $("#organization").val();
+	obj["name"] = $("#vmname").val() ;
 	obj["category"] = $('#selectCategory').val();
+	
+	let validate = true;
+	
+	if (obj["name"] == "") {
+		 $("#validationName").show();
+		 $("#vmname").css("border-color","red");
+		 validate = false;
+	}
+	else{
+		obj["name"] = obj["name"] + "." + $("#organization").val();
+		$("#validationName").hide();
+		$("#vmname").css("border-color","#ced4da");
+	}
+	if (!validate) {
+		toastr.error("All fields must be filled!");
+		return false;
+	}
 
+	
 	$.post({
 		url : "rest/vms/update",
 		contentType : 'application/json',
@@ -745,10 +922,8 @@ function deleteVm(){var button_id = this.id;
 	var name = splitted[1];
 	var obj = {};
 	obj["name"] = name;
-	$.ajax({
-		async : false,
+	$.post({
 		url : 'rest/vms/delete',
-		type : 'POST',
 		contentType : 'application/json',
 		dataType : 'json',
 		data : JSON.stringify(obj),
@@ -769,9 +944,8 @@ function searchVirtualMachines(){
 		toastr.error("Search input can't be empty");
 		return false;
 	}
-	$.ajax({
+	$.post({
 		url : 'rest/vms/search',
-		type : 'POST',
 		contentType : 'application/json',
 		dataType : 'json',
 		data : JSON.stringify(obj),
@@ -832,9 +1006,8 @@ function filterVM(){
 	// end of validation
 	
 	
-	$.ajax({
+	$.post({
 		url : 'rest/vms/filter',
-		type : 'POST',
 		contentType : 'application/json',
 		dataType : 'json',
 		data : JSON.stringify(obj),
@@ -868,8 +1041,11 @@ function getUsers() {
 }
 
 function showUsers(users) {
+	$("#search-input").hide();
+	$("#search-button").hide();
 	if (users.length > 0) {
 		$("#div_center").load("html/users.html", function() {
+			$("#usersTable td:nth-child(3), th:nth-child(4)").hide(); 
 			for (let user of users) {
 				addUserTr(user);
 			}
@@ -889,11 +1065,13 @@ function addUserTr(user){
 	let tdFirstName = $('<td>' + user.firstName + '</td>');
 	let tdLastName = $('<td>' + user.lastName  + '</td>');
 	let tdOrg = "";
-	if (user.organization == "") {
-		tdOrg = $('<td>no organization</td>');
-	}
-	else {
-		tdOrg = $('<td>' + user.organization +'</td>');
+	if (loggedUser.role == "superadmin") {
+		if (user.organization == "") {
+			tdOrg = $('<td>no organization</td>');
+		}
+		else {
+			tdOrg = $('<td>' + user.organization +'</td>');
+		}
 	}
 	if (loggedUser.email == user.email) {
 		tdButtons = $('<td>loggedUser</td>');
@@ -925,20 +1103,26 @@ function loadAddUser() {
 		$("#validationPass").hide();
 		$("#validationRole").hide();
 		$("#validationOrg").hide();
-		var options = [];
-		$.get({
-			url : 'rest/organizations/getAllNames',
-			dataType : 'json',
-			success : function(organizationNames) {
-				var len = organizationNames.length;
-				$("#selectOrganization").empty();
-				$('#selectOrganization').append("<option value='"+ "" +"'>Select value</option>");
-                for( var i = 0; i<len; i++){
-                    var org = organizationNames[i];
-                    $('#selectOrganization').append("<option value='"+org+"'>"+org+"</option>");
-                }
-			}
-		});
+		var options = []; 
+		if (loggedUser.role == "superadmin") {
+			$.get({
+				url : 'rest/organizations/getAllNames',
+				dataType : 'json',
+				success : function(organizationNames) {
+					var len = organizationNames.length;
+					$("#selectOrganization").empty();
+					$('#selectOrganization').append("<option value='"+ "" +"'>Select value</option>");
+	                for( var i = 0; i<len; i++){
+	                    var org = organizationNames[i];
+	                    $('#selectOrganization').append("<option value='"+org+"'>"+org+"</option>");
+	                }
+				}
+			});
+		}
+		else {
+			$("#organizationDiv").hide();
+
+		}
 	});
 }
 
@@ -950,7 +1134,12 @@ function addUser() {
 	obj["email"] = $("#email").val();
 	obj["firstName"] = $('#firstName').val();
 	obj["lastName"] = $("#lastName").val();
-	obj["organization"] = $('#selectOrganization').val();
+	if (loggedUser.role == 'admin') {
+		obj["organization"] = loggedUser.organization;
+	}
+	else {
+		obj["organization"] = $('#selectOrganization').val();
+	}
 	obj["password"] = $('#password').val();
 	obj["role"] = $('input[name="userType"]:checked').val();
 	let validate = true;
@@ -970,7 +1159,7 @@ function addUser() {
 	}
 	else {
 		$("#validationLast").hide();
-		$("#firstName").css("border-color","#ced4da");
+		$("#lastName").css("border-color","#ced4da");
 	}
 	if ($("#email").val() == "") {
 		 $("#validationEmail").show();
@@ -988,7 +1177,7 @@ function addUser() {
 	}
 	else {
 		$("#validationRole").hide();
-		$("#firstName").css("border-color","#ced4da");
+		$('input[name="userType"]').css("border-color","#ced4da");
 	}
 	if ($('#selectOrganization').val() == "") {
 		 $("#validationOrg").show();
@@ -1015,11 +1204,16 @@ function addUser() {
 		toastr.error("All fields must be filled!");
 		return false;
 	}
+	
+	if (!validateEmail(obj["email"])) {
+		 $("#validationEmail").show();
+		 $("#email").css("border-color","red");
+		 toastr.error("You have to enter valid email!");
+		 return false;
+	}
 
 	
-	$.ajax({
-		async: false,
-		type: 'POST',
+	$.post({
 		url : "rest/users/register",
 		contentType : 'application/json',
 		dataType : 'json',
@@ -1032,7 +1226,12 @@ function addUser() {
 			else (data == "success")
 			{
 				toastr.success("You've successfully added user!");
-        		getUsers(); 
+				if (loggedUser.role == 'admin') {
+					getUsersByOrganization();
+				}
+				else {
+					showUsers(users);
+				}
 			}
 		},
 		error: function(errorThrown ){
@@ -1048,15 +1247,18 @@ function deleteUser() {
 	var email = splitted[1];
 	var obj = {};
 	obj["email"] = email;
-	$.ajax({
-		async : false,
+	$.post({
 		url : 'rest/users/delete',
-		type : 'POST',
 		contentType : 'application/json',
 		dataType : 'json',
 		data : JSON.stringify(obj),
 		success : function(users) {
-			showUsers(users);
+			if (loggedUser.role == 'admin') {
+				getUsersByOrganization();
+			}
+			else {
+				getUsers();
+			}
 		},
 		error : function(errorThrown) {
 			toastr.error(errorThrown);
@@ -1072,7 +1274,7 @@ function loadEditUser() {
 	oldName = email;
 	obj["email"] = email;
 	$("#div_center").load("html/editUser.html", function() {
-		
+	$("#organizationDiv").hide();
 		$.post({
 			url : 'rest/users/getByEmail',
 			contentType : 'application/json',
@@ -1148,9 +1350,7 @@ function editUser() {
 	}
 
 	
-	$.ajax({
-		async: false,
-		type: 'POST',
+	$.post({
 		url : "rest/users/updateUser",
 		contentType : 'application/json',
 		dataType : 'json',
@@ -1198,6 +1398,8 @@ function getCategories() {
 }
 
 function showCategories(categories) {
+	$("#search-input").hide();
+	$("#search-button").hide();
 	if (categories.length > 0) {
 		$("#div_center").load("html/vmCategory.html", function() {
 			for (let category of categories) {
@@ -1236,6 +1438,11 @@ function addCategoryTr(category){
 function loadAddVmCategory() {
 	$("#div_center").load("html/add_category.html", function() {
 		$("#add_vmcategory").on("click", addCategory);
+		$("#validationName").hide();
+		$("#validationCores").hide();
+		$("#validationRam").hide();
+		$("#validationGpu").hide();
+		
 	});
 }
 
@@ -1248,15 +1455,65 @@ function addCategory() {
 	obj["numOfCores"] = $('#numOfCores').val();
 	obj["ram"] = $("#ram").val();
 	obj["numOfGpuCores"] = $('#gpu').val();	
-	if ($("#cat_name").val() == "")                                  
-	    { 
-	        window.alert("Please enter your name."); 
-	        name.focus(); 
-	        return false; 
-	    } 
-	$.ajax({
-		async: false,
-		type: 'POST',
+	
+	let validate = true;
+	
+	if (obj["name"] == "") {
+		 $("#validationName").show();
+		 $("#cat_name").css("border-color","red");
+		 validate = false;
+	}
+	else{
+		$("#validationName").hide();
+		$("#cat_name").css("border-color","#ced4da");
+	}
+	if (obj["numOfCores"] == "") {
+		 $("#validationCores").show();
+		 $("#numOfCores").css("border-color","red");
+		 validate = false;
+	}
+	else {
+		$("#validationCores").hide();
+		$("#numOfCores").css("border-color","#ced4da");
+	}
+	if (obj["ram"] == "") {
+		 $("#validationRam").show();
+		 $("#ram").css("border-color","red");
+		 validate = false;
+	}
+	else {
+		$("#validationRam").hide();
+		$("#ram").css("border-color","#ced4da");
+	}
+	if (obj["numOfGpuCores"] == "") {
+		 $("#validationGpu").show();
+		 $("#gpu").css("border-color","red");
+		 validate = false;
+	}
+	else {
+		$("#validationGpu").hide();
+		$("#gpu").css("border-color","#ced4da");
+	}
+
+	if (!validate) {
+		toastr.error("All fields must be filled!");
+		return false;
+	}
+	if ($('#numOfCores').val() == 0) {
+		toastr.error("Number of cores has to be bigger than 0!");
+		return false;
+	}
+	if ($('#ram').val() == 0) {
+		toastr.error("Ram has to be bigger than 0!");
+		return false;
+	}
+	
+	if ($('#gpu').val() == 0) {
+		toastr.error("GPU has to be bigger than 0!");
+		return false;
+	}
+
+	$.post({
 		url : "rest/vmcategories/add",
 		contentType : 'application/json',
 		dataType : 'json',
@@ -1286,10 +1543,8 @@ function deleteCategory() {
 	var name = splitted[1];
 	var obj = {};
 	obj["name"] = name;
-	$.ajax({
-		async : false,
+	$.post({
 		url : 'rest/vmcategories/delete',
-		type : 'POST',
 		contentType : 'application/json',
 		dataType : 'json',
 		data : JSON.stringify(obj),
@@ -1336,6 +1591,10 @@ function fillEditFieldsCategory(category) {
 	$("#ram").val(category.ram);
 	$("#gpu").val(category.numOfGpuCores);
 	$("#add_vmcategory").html("update")
+	$("#validationName").hide();
+	$("#validationCores").hide();
+	$("#validationRam").hide();
+	$("#validationGpu").hide();
 }
 
 function editCategory() {
@@ -1345,6 +1604,64 @@ function editCategory() {
 	obj["ram"] = $("#ram").val();
 	obj["gpu"] = $("#gpu").val();
 	obj["cores"] = $("#numOfCores").val();
+	
+	let validate = true;
+	
+	if (obj["name"] == "") {
+		 $("#validationName").show();
+		 $("#cat_name").css("border-color","red");
+		 validate = false;
+	}
+	else{
+		$("#validationName").hide();
+		$("#cat_name").css("border-color","#ced4da");
+	}
+	if (obj["cores"] == "") {
+		 $("#validationCores").show();
+		 $("#numOfCores").css("border-color","red");
+		 validate = false;
+	}
+	else {
+		$("#validationCores").hide();
+		$("#numOfCores").css("border-color","#ced4da");
+	}
+	if (obj["ram"] == "") {
+		 $("#validationRam").show();
+		 $("#ram").css("border-color","red");
+		 validate = false;
+	}
+	else {
+		$("#validationRam").hide();
+		$("#ram").css("border-color","#ced4da");
+	}
+	if (obj["gpu"] == "") {
+		 $("#validationGpu").show();
+		 $("#gpu").css("border-color","red");
+		 validate = false;
+	}
+	else {
+		$("#validationGpu").hide();
+		$("#gpu").css("border-color","#ced4da");
+	}
+
+	if (!validate) {
+		toastr.error("All fields must be filled!");
+		return false;
+	}
+	if ($('#numOfCores').val() == 0) {
+		toastr.error("Number of cores has to be bigger than 0!");
+		return false;
+	}
+	if ($('#ram').val() == 0) {
+		toastr.error("Ram has to be bigger than 0!");
+		return false;
+	}
+	
+	if ($('#gpu').val() == 0) {
+		toastr.error("GPU has to be bigger than 0!");
+		return false;
+	}
+
 
 	$.post({
 		url : "rest/vmcategories/update",
@@ -1405,7 +1722,8 @@ function getDisks() {
 }
 
 function showDisks(disks) {
-	
+	$("#search-input").show();
+	$("#search-button").show();
 	if (disks.length > 0) {
 		$("#div_center").load("html/disks.html", function() {
 			for (let disk of disks) {
@@ -1447,6 +1765,12 @@ function addDiskTr(disk){
 
 function loadAddDisk() {
 	$("#div_center").load("html/add_disk.html", function() {
+		$("organizationDiv").hide();
+		$("#validationName").hide();
+		$("#validationOrg").hide();
+		$("#validationVM").hide();
+		$("#validationCapacity").hide();
+		$("#validationType").hide();
 		$("#button_add_disk").on("click", addDisk);
 		$.get({
 			url : 'rest/organizations/getAllNames',
@@ -1509,7 +1833,59 @@ function addDisk() {
 		obj["virtualMachine"] = $("#selectVM").val() + "." + $('#selectOrganization').val();
 	}
 	obj["organization"] = $('#selectOrganization').val();
+	
+	let validate = true;
+	if ($("#name").val() == "") {
+		 $("#validationName").show();
+		 $("#name").css("border-color","red");
+		 validate = false;
+	}
+	else{
+		$("#validationName").hide();
+		$("#name").css("border-color","#ced4da");
+	}
+	if ($("#selectOrganization").val() == "") {
+		 $("#validationOrg").show();
+		 $("#selectOrganization").css("border-color","red");
+		 validate = false;
+	}
+	else {
+		$("#validationOrg").hide();
+		$("#selectOrganization").css("border-color","#ced4da");
+	}
+	if ($("#selectVM").val() == "") {
+		 $("#validationVM").show();
+		 $("#selectVM").css("border-color","red");
+		 validate = false;
+	}
+	else {
+		$("#validationVM").hide();
+		$("#selectVM").css("border-color","#ced4da");
+	}
+	if ( $('input[name="diskType"]:checked').val() == undefined) {
+		 $("#validationType").show();
+		 $('input[name="diskType"]').css("border-color", "red");
+		 validate = false;
+	}
+	else {
+		$("#validationType").hide();
+		$('input[name="diskType"]').css("border-color","#ced4da");
+	}
+	if ($('#capacity').val() == "") {
+		 $("#validationCapacity").show();
+		 $("#capacity").css("border-color","red");
+		 validate = false;
+	}
+	else {
+		$("#validationCapacity").hide();
+		$("#capacity").css("border-color","#ced4da");
 
+	}
+	
+	if (!validate) {
+		toastr.error("All fields must be filled!");
+		return false;
+	}
 	
 	$.post({
 		url : "rest/disks/add",
@@ -1521,7 +1897,7 @@ function addDisk() {
 			{
 				toastr.error("Disk name already exists!");
 			}
-			else (data == "success")
+			else if (data == "success")
 			{
 				toastr.success("You've successfully added new disk!");
         		getDisks(); 
@@ -1583,6 +1959,11 @@ function loadEditDisk() {
 }
 
 function fillEditFieldsDisk(disk) {
+	$("#validationName").hide();
+	$("#validationOrg").hide();
+	$("#validationVM").hide();
+	$("#validationCapacity").hide();
+	$("#validationType").hide();
 	$("#name").val(disk.name);
 	$("#capacity").val(disk.capacity);
 	$("input[name=diskType][value="+ disk.diskType+ "]").prop("checked",true);
@@ -1591,9 +1972,7 @@ function fillEditFieldsDisk(disk) {
 	$("#button_edit_disk").html("Update disk")
 	var obj = {};
 	obj["organization"] = disk.organization;
-	$.ajax({
-		async: false,
-		type: 'POST',
+	$.post({
 		url : 'rest/vms/getByCompany',
 		contentType : 'application/json',
 		dataType : 'json',
@@ -1641,7 +2020,50 @@ function editDisk() {
 	}
 	obj["organization"] = $('#organization').val();
 
+	if ($("#selectVM").val() != "") {
+		obj["virtualMachine"] = $("#selectVM").val() + "." + $('#selectOrganization').val();
+	}
+	obj["organization"] = $('#selectOrganization').val();
 	
+	let validate = true;
+	if ($("#name").val() == "") {
+		 $("#validationName").show();
+		 $("#name").css("border-color","red");
+		 validate = false;
+	}
+	else{
+		$("#validationName").hide();
+		$("#name").css("border-color","#ced4da");
+	}
+	if ($("#selectVM").val() == "") {
+		 $("#validationVM").show();
+		 $("#selectVM").css("border-color","red");
+		 validate = false;
+	}
+	else {
+		$("#validationVM").hide();
+		$("#selectVM").css("border-color","#ced4da");
+	}
+	if ($('#capacity').val() == "") {
+		 $("#validationCapacity").show();
+		 $("#capacity").css("border-color","red");
+		 validate = false;
+	}
+	else {
+		$("#validationCapacity").hide();
+		$("#capacity").css("border-color","#ced4da");
+
+	}
+	if ($('#capacity').val() == 0) {
+		toastr.error("Capacity has to be bigger than 0gb!");
+		return false;
+	}
+	
+	if (!validate) {
+		toastr.error("All fields must be filled!");
+		return false;
+	}
+
 	$.post({
 		url : "rest/disks/update",
 		contentType : 'application/json',
@@ -1782,3 +2204,65 @@ $(document).on("change", "#vmOffOn", function(){
 		});
 	}
 });
+
+////////////////////////////////////////// admin
+
+function getVirtualMachinesByOrganization() {
+	searchResults = [];
+	filterResults = [];
+	$.get({
+		url : 'rest/vms/getByOrganization',
+		dataType : 'json',
+		success : function(vms) {
+			showVirtualMachines(vms);
+		},
+		error : function(errorThrown) {
+			toastr.error(errorThrown);
+		}
+	});
+}
+
+function getUsersByOrganization() {
+	$.get({
+		url : 'rest/users/getByOrganization',
+		dataType : 'json',
+		success : function(users) {
+			showUsers(users);
+		},
+		error : function(errorThrown) {
+			toastr.error(errorThrown);
+		}
+	});
+}
+
+function getDisksByOrganization() {
+	searchResults = [];
+	filterResults = [];
+	$.get({
+		url : 'rest/disks/getByOrganization',
+		dataType : 'json',
+		success : function(disks) {
+			showDisks(disks);
+		},
+		error : function(errorThrown) {
+			toastr.error(errorThrown);
+		}
+	});
+}
+
+
+
+
+
+
+////////////////////////////////////
+
+$('#search-input').keypress(function (e) {                                       
+         e.preventDefault();
+});
+
+function validateEmail(email) 
+{
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+}
