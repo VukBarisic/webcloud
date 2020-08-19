@@ -1,6 +1,7 @@
 package services;
 
 import java.util.ArrayList;
+
 import java.util.HashMap;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,9 +15,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import helpers.HelperMethods;
+import model.Role;
 import model.User;
 import model.VirtualMachine;
-import repository.DiskRepository;
 import repository.VmRepository;
 
 @Path("vms")
@@ -24,19 +25,27 @@ public class VirtualMachineService {
 
 	@Context
 	HttpServletRequest request;
+	
+	User loggedUser;
 
 	@POST
 	@Path("/add")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addVirtualMachine(HashMap<String, String> data) {
+		
+		loggedUser = (User) request.getSession().getAttribute("user");
+		
+		if (loggedUser == null || loggedUser.getRole().equals(Role.superadmin)) {
+			return Response.status(403).entity(HelperMethods.GetJsonValue("Unauthorized")).build();
+		}
 
 		if (!VmRepository.isUniqueVm(data.get("name") + "_" + data.get("organization"))) {
-			return Response.status(200).entity("existError").build();
+			return Response.status(200).entity(HelperMethods.GetJsonValue("existError")).build();
 		}
 		boolean success = VmRepository.saveVirtualMachine(data);
 		if (!success) {
-			return Response.status(400).entity("Error adding vm").build();
+			return Response.status(400).entity(HelperMethods.GetJsonValue("Bad Request")).build();
 		}
 		return Response.status(200).entity(HelperMethods.GetJsonValue("success")).build();
 
@@ -46,6 +55,12 @@ public class VirtualMachineService {
 	@Path("/getAll")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getVirtualMachines() {
+		
+		loggedUser = (User) request.getSession().getAttribute("user");
+		
+		if (loggedUser == null || !loggedUser.getRole().equals(Role.superadmin)) {
+			return Response.status(403).entity(HelperMethods.GetJsonValue("Unauthorized")).build();
+		}
 		ArrayList<VirtualMachine> virtualMachines = VmRepository.getVirtualMachines();
 
 		return Response.status(200).entity(virtualMachines).build();
@@ -57,6 +72,12 @@ public class VirtualMachineService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteVirtualMachine(HashMap<String, String> data) {
+		
+		loggedUser = (User) request.getSession().getAttribute("user");
+		
+		if (loggedUser == null || loggedUser.getRole().equals(Role.user)) {
+			return Response.status(403).entity(HelperMethods.GetJsonValue("Unauthorized")).build();
+		}
 		String name = data.get("name");
 		if (VmRepository.deleteVirtualMachine(name)) {
 			return Response.status(200).entity(VmRepository.getVirtualMachines()).build();
@@ -70,6 +91,11 @@ public class VirtualMachineService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response searchVirtualMachines(HashMap<String, String> data) {
+		loggedUser = (User) request.getSession().getAttribute("user");
+		
+		if (loggedUser == null || !loggedUser.getRole().equals(Role.superadmin)) {
+			return Response.status(403).entity(HelperMethods.GetJsonValue("Unauthorized")).build();
+		}
 		String name = data.get("name");
 		return Response.status(200).entity(VmRepository.searchVirtualMachines(name)).build();
 	}
@@ -79,19 +105,27 @@ public class VirtualMachineService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getbyOrgName(HashMap<String, String> data) {
-
+		loggedUser = (User) request.getSession().getAttribute("user");
+		
+		if (loggedUser == null) {
+			return Response.status(403).entity(HelperMethods.GetJsonValue("Unauthorized")).build();
+		}
 		return Response.status(200).entity(VmRepository.getVmNamesByCompany(data.get("organization"))).build();
-
 	}
+	
 	@GET
 	@Path("/getByOrganization")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getbyOrganization(HashMap<String, String> data) {
 		
-		User user = (User) request.getSession().getAttribute("user");
+		loggedUser = (User) request.getSession().getAttribute("user");
+		
+		if (loggedUser == null || loggedUser.getRole().equals(Role.superadmin)) {
+			return Response.status(403).entity(HelperMethods.GetJsonValue("Unauthorized")).build();
+		}
 
 
-		return Response.status(200).entity(VmRepository.getVirtualMachinesByCompany(user.getOrganization())).build();
+		return Response.status(200).entity(VmRepository.getVirtualMachinesByCompany(loggedUser.getOrganization())).build();
 
 	}
 	
@@ -100,6 +134,11 @@ public class VirtualMachineService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getbyName(HashMap<String, String> data) {
+		loggedUser = (User) request.getSession().getAttribute("user");
+		
+		if (loggedUser == null) {
+			return Response.status(403).entity(HelperMethods.GetJsonValue("Unauthorized")).build();
+		}
 		return Response.status(200).entity(VmRepository.findByName(data.get("name"))).build();
 	}
 	
@@ -108,6 +147,11 @@ public class VirtualMachineService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response filterVirtualMachines(HashMap<String, String> data) {
+		loggedUser = (User) request.getSession().getAttribute("user");
+		
+		if (loggedUser == null || !loggedUser.getRole().equals(Role.superadmin)) {
+			return Response.status(403).entity(HelperMethods.GetJsonValue("Unauthorized")).build();
+		}
 		return Response.status(200).entity(VmRepository.filterVirtualMachines(data)).build();
 	}
 	
@@ -117,6 +161,11 @@ public class VirtualMachineService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response turnVirtualMachinesOffOn(HashMap<String, String> data) {
+		loggedUser = (User) request.getSession().getAttribute("user");
+		
+		if (loggedUser == null || loggedUser.getRole().equals(Role.user)) {
+			return Response.status(403).entity(HelperMethods.GetJsonValue("Unauthorized")).build();
+		}
 		return Response.status(200).entity(HelperMethods.GetJsonValue(VmRepository.turnVirtualMachinesOffOn(data))).build();
 	}
 
@@ -125,14 +174,20 @@ public class VirtualMachineService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateVM(HashMap<String, String> data) {
+		loggedUser = (User) request.getSession().getAttribute("user");
+		
+		if (loggedUser == null || loggedUser.getRole().equals(Role.user)) {
+			return Response.status(403).entity(HelperMethods.GetJsonValue("Unauthorized")).build();
+		}
 		if (!data.get("oldName").equals(data.get("name")) && !VmRepository.isUniqueVm(data.get("name"))) {
-			return Response.status(200).entity("existError").build();
+			return Response.status(200).entity(HelperMethods.GetJsonValue("existError")).build();
 		}
 		boolean success = VmRepository.updateVm(data);
 		if (!success) {
-			return Response.status(400).entity("Error updating vm").build();
+			return Response.status(400).entity("Bad request").build();
 		}
-		return Response.status(200).entity(HelperMethods.GetJsonValue(success)).build();
+		return Response.status(200).entity(HelperMethods.GetJsonValue("success")).build();
+		
 
 	}
 }

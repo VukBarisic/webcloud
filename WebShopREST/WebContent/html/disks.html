@@ -1,5 +1,4 @@
 <style>
-
 label {
 	position: absolute;
 	left: 200px;
@@ -12,17 +11,19 @@ label {
 				<label>Capacity</label>
 				<div class="form-row">
 					<div class="col form-group">
-						<input type="number" id = "capacityFrom" onkeypress="return validateNumber(event);"
-							class="form-control" min="0" placeholder="from.."
-							autocomplete="off" />
+						<input type="number" id="capacityFrom"
+							onkeypress="return validateNumber(event);" class="form-control"
+							min="0" placeholder="from.." autocomplete="off" />
 					</div>
 					<div class="col form-group">
-						<input type="number" id = "capacityTo" onkeypress="return validateNumber(event);"
-							class="form-control" min="0" placeholder="to" autocomplete="off" />
+						<input type="number" id="capacityTo"
+							onkeypress="return validateNumber(event);" class="form-control"
+							min="0" placeholder="to" autocomplete="off" />
 					</div>
 
 					<div class="col form-group">
-						<button type="button" id="filter_disks" onclick="filterDisks()" class="btn btn-primary">Filter</button>
+						<button type="button" id="filter_disks" onclick="filterDisks()"
+							class="btn btn-primary">Filter</button>
 					</div>
 				</div>
 			</form>
@@ -46,7 +47,7 @@ label {
 		</tbody>
 	</table>
 	<div class="text-center">
-		<button id="load_add_disk" class="btn btn-primary"
-			onclick="loadAddDisk()">Add disk</button>
+		<button id="load_add_disk" class="btn btn-primary">Add
+			disk</button>
 	</div>
 </div>

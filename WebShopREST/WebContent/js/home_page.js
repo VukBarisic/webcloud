@@ -17,19 +17,9 @@ function loadHomePage() {
 		$("#index_nav").show();
 		var x = document.getElementById("loggedUserDrop");
 		x.innerHTML = loggedUser.email;
-		$("#logout").on("click", logout);
-		$("#myProfile").on("click", loadMyProfile);
+		$("#logout").off().on("click", logout);
+		$("#myProfile").off().on("click", loadMyProfile);
 		byUserType();
-		/*
-		getVirtualMachines();
-		$("#button_login").on("click", login);
-		$("#home").on("click", getVirtualMachines);
-		$("#organizations").on("click", getOrganizations);
-		$("#users").on("click", getUsers);
-		$("#disks").on("click", getDisks);
-		$("#vmCategories").on("click", getCategories);
-		$("#myProfile").on("click", loadMyProfile);
-		*/
 
 	}
 
@@ -44,11 +34,11 @@ function byUserType() {
 		$("#vmCategories").show();
 		$("#users").show();
 		getVirtualMachines();
-		$("#home").on("click", getVirtualMachines);
-		$("#organizations").on("click", getOrganizations);
-		$("#users").on("click", getUsers);
-		$("#disks").on("click", getDisks);
-		$("#vmCategories").on("click", getCategories);
+		$("#home").off().on("click", getVirtualMachines);
+		$("#organizations").off().on("click", getOrganizations);
+		$("#users").off().on("click", getUsers);
+		$("#disks").off().on("click", getDisks);
+		$("#vmCategories").off().on("click", getCategories);
 	}
 	else if (loggedUser.role == 'admin') {
 		$("#vmCategories").hide();
@@ -56,13 +46,11 @@ function byUserType() {
 		$("#myOrganization").show();
 		$("#monthlyReport").show();
 		getVirtualMachinesByOrganization();
-		$("#home").on("click", getVirtualMachinesByOrganization);
-		$("#monthlyReport").on("click", loadMonthlyReport);
-		$("#myOrganization").on("click", loadEditOrganization);
-		$("#users").on("click", getUsersByOrganization);
-		$("#disks").on("click", getDisksByOrganization);
-		
-		
+		$("#home").off().on("click", getVirtualMachinesByOrganization);
+		$("#monthlyReport").off().on("click", loadMonthlyReport);
+		$("#myOrganization").off().on("click", loadEditOrganization);
+		$("#users").off().on("click", getUsersByOrganization);
+		$("#disks").off().on("click", getDisksByOrganization);
 	}
 	else {
 		$("#myOrganization").hide();
@@ -71,8 +59,8 @@ function byUserType() {
 		$("#vmCategories").hide();
 		$("#monthlyReport").hide();
 		getVirtualMachinesByOrganization();
-		$("#disks").on("click", getDisksByOrganization);
-		$("#home").on("click", getVirtualMachinesByOrganization);
+		$("#disks").off().on("click", getDisksByOrganization);
+		$("#home").off().on("click", getVirtualMachinesByOrganization);
 
 	}
 }
@@ -107,10 +95,9 @@ function calculatePrice(){
 			$("#div_center").append("<p>The price for " + $("#monthPicker").val() + " is " + price + "$.</p>");
 		},
 		error: function(errorThrown ){
-			toastr.error( errorThrown );
+			toastr.error(errorThrown.responseText);
 		}
 	});
-	
 }
 
 function loadMyProfile() {
@@ -119,7 +106,6 @@ function loadMyProfile() {
 		fillMyProfileFields();
 	});
 }
-
 
 function fillMyProfileFields() {
 	$("#validationFirst").hide();
@@ -138,7 +124,6 @@ function fillMyProfileFields() {
 		$("#organization").prop( "disabled", true );
 	}
 }
-
 
 function editMyProfile() {
 
@@ -203,7 +188,6 @@ function editMyProfile() {
 		return false;
 	}
 
-	
 	$.post({
 		url : "rest/users/updateMyProfile",
 		contentType : 'application/json',
@@ -215,14 +199,11 @@ function editMyProfile() {
         		getUsers(); 
 		},
 		error: function(errorThrown ){
-			toastr.error( errorThrown );
+			toastr.error(errorThrown.responseText);
 		}
 	});
 	
-	
 }
-
-
 
 function loadLoginPage() {
 	$("#div_center").load("html/login.html", function() {
@@ -230,6 +211,7 @@ function loadLoginPage() {
 	});
 
 }
+
 function login() {
 
 	var obj = {};
@@ -255,15 +237,13 @@ function login() {
 			contentType : 'application/json',
 			dataType : 'json',
 			data : JSON.stringify(obj),
-			success : function(response) {
-				if (response == undefined) {
-					toastr.error('Wrong username or password try again!');
-				} else {
-					toastr.success('Welcome ' + response);
-				}
+			success : function(user) {
+					toastr.success('Welcome ' + user.email);
+					loadHomePage()
+			
 			},
 			error : function(errorThrown) {
-				toastr.error(errorThrown);
+				toastr.error(errorThrown.responseText);
 			}
 		});
 	}
@@ -284,7 +264,7 @@ function getLoggedUser() {
 			}
 		},
 		error : function(errorThrown) {
-			toastr.error(errorThrown);
+			toastr.error(errorThrown.responseText);
 		}
 	});
 	return user;
@@ -308,7 +288,7 @@ function logout() {
 			}
 		},
 		error : function(errorThrown) {
-			toastr.error(errorThrown);
+			toastr.error(errorThrown.responseText);
 		}
 	});
 
@@ -325,7 +305,7 @@ function getOrganizations() {
 			showOrganizations(organizations);
 		},
 		error : function(errorThrown) {
-			toastr.error(errorThrown);
+			toastr.error(errorThrown.responseText);
 		}
 	});
 }
@@ -347,8 +327,6 @@ function showOrganizations(organizations) {
 	$("#add_organization").off().on("click", loadAddOrganization);
 }
 
-
-
 function addOrganizationTr(organization){
 	let tr = $('<tr class="text-center"></tr>');
 	let tdLogo = $('<td style="width:70%" class="w-25"><img style="width:100%;" class="img-responsive" src= imgs/' + organization.logo  + ' alt="Loading.."></td>');
@@ -362,8 +340,6 @@ function addOrganizationTr(organization){
 	$('#organizationsTable tbody').append(tr);
 	document.getElementById(buttonEditId).addEventListener("click", loadEditOrganization);
 	document.getElementById(buttonDelId).addEventListener("click", deleteOrganization);
-
-
 }
 
 function loadAddOrganization() {
@@ -374,8 +350,6 @@ function loadAddOrganization() {
 		$("#validationFile").hide();
 	});
 }
-
-
 
 function addOrganization() {
 		
@@ -445,13 +419,13 @@ function addOrganization() {
 			        	}
 			        },
 					error: function(errorThrown){
-						toastr.error( errorThrown );
+						toastr.error(errorThrown.responseText);
 					}
 				}); 
 			}
 		},
 		error: function(errorThrown ){
-			toastr.error( errorThrown );
+			toastr.error(errorThrown.responseText);
 		}
 	});
 	
@@ -472,7 +446,7 @@ function deleteOrganization() {
 			showOrganizations(organizations);
 		},
 		error : function(errorThrown) {
-			toastr.error(errorThrown);
+			toastr.error(errorThrown.responseText);
 		}
 	});
 }
@@ -503,7 +477,7 @@ function loadEditOrganization() {
 				fillEditFieldsOrg(organization);
 			},
 			error : function(errorThrown) {
-				toastr.error(errorThrown);
+				toastr.error(errorThrown.responseText);
 			}
 	
 	});
@@ -563,7 +537,6 @@ function editOrganization() {
 		return false;
 	}
 	
-
 	$.post({
 		url : "rest/organizations/update",
 		contentType : 'application/json',
@@ -592,7 +565,7 @@ function editOrganization() {
 			        	}
 			        },
 					error: function(errorThrown){
-						toastr.error( errorThrown );
+						toastr.error(errorThrown.responseText);
 					}
 				}); 
 			}
@@ -602,11 +575,12 @@ function editOrganization() {
 			}
 		},
 		error: function(errorThrown ){
-			toastr.error( errorThrown );
+			toastr.error(errorThrown.responseText);
 		}
 	});
 	
 }
+
 function searchOrganizations() {
 	var obj = {};
 	obj["name"] = $("#search-input").val();
@@ -623,7 +597,7 @@ function searchOrganizations() {
 			showOrganizations(organizations);
 		},
 		error : function(errorThrown) {
-			toastr.error(errorThrown);
+			toastr.error(errorThrown.responseText);
 		}
 	});
 }
@@ -638,7 +612,7 @@ function getVirtualMachines() {
 			showVirtualMachines(vms);
 		},
 		error : function(errorThrown) {
-			toastr.error(errorThrown);
+			toastr.error(errorThrown.responseText);
 		}
 	});
 }
@@ -648,17 +622,30 @@ function showVirtualMachines(virtualMachines){
 	$("#search-button").show();
 	if (virtualMachines.length > 0) {
 		$("#div_center").load("html/virtualmachines.html", function() {
+			if (loggedUser.role == "user") {
+				$("#add_vm").hide();
+			}
+			else {
+				$("#add_vm").on("click", loadAddVm);
+			}
 			for (let vm of virtualMachines) {
 				addVirtualMachineTr(vm);
 			}
 		});	
 	}
 	else {
-		$("#div_center").load("html/no_vms.html");
+		$("#div_center").load("html/no_vms.html", function() {
+		if (loggedUser.role == "user") {
+			$("#add_vm").hide();
+		}
+		else {
+			$("#add_vm").on("click", loadAddVm);
+		}
+		});
 	}
+	
 	$("#search-button").off().on("click", searchVirtualMachines);
 	$("#filter_vm").off().on("click", filterVM);
-	$("#add_vm").on("click", loadAddOrganization);
 }
 
 function addVirtualMachineTr(virtualMachine){
@@ -671,12 +658,14 @@ function addVirtualMachineTr(virtualMachine){
 	var buttonDelId = "del_" + virtualMachine.name;
 	var buttonEditId = "edit_" + virtualMachine.name;
 	let tdButtons = $('<td><button type="button" id = "' + buttonEditId + '" data-toggle="modal" class="btn btn-warning btn-rounded btn-sm my-0"><i class="fa fa-edit"></i></button><button type="button" id = "' + buttonDelId + '" class="btn btn-danger btn-rounded btn-sm my-0"><i class="fa fa-times" aria-hidden="true"></i></button></td>');
-
+	
 	tr.append(tdName).append(tdCores).append(tdRam).append(tdGpuCores).append(organization).append(tdButtons);
 	$('#vmTable tbody').append(tr);
+	if (loggedUser.role == "user") {
+		$("#"+ buttonDelId).hide();
+	}
 	document.getElementById(buttonEditId).addEventListener("click", loadEditVm);
 	document.getElementById(buttonDelId).addEventListener("click", deleteVm);
-
 
 }
 
@@ -722,8 +711,8 @@ function loadAddVm() {
 			}
 		});
 	});	
-
 }
+
 $(document).on("change", "#selectCategory", function(){
 	var obj = {};
 	obj["name"] = $(this).val();
@@ -738,16 +727,21 @@ $(document).on("change", "#selectCategory", function(){
 			$("#gpu").val(category.numOfGpuCores);
 		},
 		error : function(errorThrown) {
-			toastr.error(errorThrown);
+			toastr.error(errorThrown.responseText);
 		}
-});
+	});
 });
 
 function addVirtualMachine() {
 	
 	var obj = {};
 	obj["name"] = $("#vmname").val();
-	obj["organization"] = $("#selectOrganization").val();
+	if (loggedUser.role == "superadmin") {
+		obj["organization"] = $("#selectOrganization").val();
+	}
+	else {
+		obj["organization"] = loggedUser.organization;
+	}
 	obj["category"] = $('#selectCategory').val();
 	
 	let validate = true;
@@ -761,7 +755,7 @@ function addVirtualMachine() {
 		$("#validationName").hide();
 		$("#vmname").css("border-color","#ced4da");
 	}
-	if (obj["organization"] == "") {
+	if (loggedUser.role == "superadmin" && obj["organization"] == "") {
 		 $("#validationOrg").show();
 		 $("#selectOrganization").css("border-color","red");
 		 validate = false;
@@ -785,7 +779,6 @@ function addVirtualMachine() {
 		return false;
 	}
 
-	
 	$.post({
 		url : "rest/vms/add",
 		contentType : 'application/json',
@@ -799,11 +792,16 @@ function addVirtualMachine() {
 			else (data == "success")
 			{
 				toastr.success("You've successfully added virtual machine!");
-        		getVirtualMachines();
+				if (loggedUser.role == 'admin') {
+					getVirtualMachinesByOrganization();
+				}
+				else {
+					getVirtualMachines();
+				} 
 			}
 			},
 		error: function(errorThrown ){
-				toastr.error( errorThrown );
+				toastr.error(errorThrown.responseText);
 			}
 		});
 			
@@ -827,7 +825,7 @@ function loadEditVm() {
 				fillEditFieldsVm(vm);
 			},
 			error : function(errorThrown) {
-				toastr.error(errorThrown);
+				toastr.error(errorThrown.responseText);
 			}
 	
 	});
@@ -863,11 +861,8 @@ function fillEditFieldsVm(vm) {
                 $('#selectCategory').append("<option value='" + cat + "'>" + cat + "</option>");
             }
            $("#selectCategory").prop("selectedIndex", index).change();        	
-
 		}
 	});
-	
-
 }
 
 function editVm(){
@@ -893,7 +888,6 @@ function editVm(){
 		return false;
 	}
 
-	
 	$.post({
 		url : "rest/vms/update",
 		contentType : 'application/json',
@@ -907,17 +901,22 @@ function editVm(){
 			else (data == "success")
 			{
 				toastr.success("You've successfully updated virtual machine!");
-        		getVirtualMachines(); 
+				if (loggedUser.role == 'admin') {
+					getVirtualMachinesByOrganization();
+				}
+				else {
+					getVirtualMachines();
+				}  
 			}
 		},
 		error: function(errorThrown ){
-			toastr.error( errorThrown );
+			toastr.error(errorThrown.responseText);
 		}
 	});
-	
 }
 
-function deleteVm(){var button_id = this.id;
+function deleteVm(){
+	var button_id = this.id;
 	var splitted = button_id.split('_');
 	var name = splitted[1];
 	var obj = {};
@@ -928,13 +927,17 @@ function deleteVm(){var button_id = this.id;
 		dataType : 'json',
 		data : JSON.stringify(obj),
 		success : function(vms) {
-			showVirtualMachines(vms);
+			if (loggedUser.role == 'admin') {
+				getVirtualMachinesByOrganization();
+			}
+			else {
+				getVirtualMachines();
+			} 
 		},
 		error : function(errorThrown) {
-			toastr.error(errorThrown);
+			toastr.error(errorThrown.responseText);
 		}
-	});
-	
+	});	
 }
 
 function searchVirtualMachines(){
@@ -959,10 +962,10 @@ function searchVirtualMachines(){
 			}
 		},
 		error : function(errorThrown) {
-			toastr.error(errorThrown);
+			toastr.error(errorThrown.responseText);
 		}
 	});
-	}
+}
 
 function filterVM(){
 	var obj = {};
@@ -1002,9 +1005,7 @@ function filterVM(){
 		toastr.error("Right field number has to be bigger than left");
 		return false;
 	}
-	
 	// end of validation
-	
 	
 	$.post({
 		url : 'rest/vms/filter',
@@ -1021,11 +1022,10 @@ function filterVM(){
 			}
 		},
 		error : function(errorThrown) {
-			toastr.error(errorThrown);
+			toastr.error(errorThrown.responseText);
 		}
 	});
-	}
-
+}
 
 function getUsers() {
 	$.get({
@@ -1035,7 +1035,7 @@ function getUsers() {
 			showUsers(users);
 		},
 		error : function(errorThrown) {
-			toastr.error(errorThrown);
+			toastr.error(errorThrown.responseText);
 		}
 	});
 }
@@ -1057,7 +1057,6 @@ function showUsers(users) {
 	$("#search-button").on("click", searchUsers);
 	$("#add_user").on("click", loadAddUser);
 }
-
 
 function addUserTr(user){
 	let tr = $('<tr class="text-center"></tr>');
@@ -1092,7 +1091,7 @@ function addUserTr(user){
 		document.getElementById(buttonEditId).addEventListener("click", loadEditUser);
 		document.getElementById(buttonDelId).addEventListener("click", deleteUser);
 	}
-	}
+}
 	
 function loadAddUser() {
 	$("#div_center").load("html/add_user.html", function() {
@@ -1121,12 +1120,9 @@ function loadAddUser() {
 		}
 		else {
 			$("#organizationDiv").hide();
-
 		}
 	});
 }
-
-
 
 function addUser() {
 		
@@ -1211,7 +1207,6 @@ function addUser() {
 		 toastr.error("You have to enter valid email!");
 		 return false;
 	}
-
 	
 	$.post({
 		url : "rest/users/register",
@@ -1230,15 +1225,14 @@ function addUser() {
 					getUsersByOrganization();
 				}
 				else {
-					showUsers(users);
+					getUsers();
 				}
 			}
 		},
 		error: function(errorThrown ){
-			toastr.error( errorThrown );
+			toastr.error(errorThrown.responseText);
 		}
 	});
-	
 }
 
 function deleteUser() {
@@ -1261,7 +1255,7 @@ function deleteUser() {
 			}
 		},
 		error : function(errorThrown) {
-			toastr.error(errorThrown);
+			toastr.error(errorThrown.responseText);
 		}
 	});
 }
@@ -1284,7 +1278,7 @@ function loadEditUser() {
 				fillUserEditFields(user);
 			},
 			error : function(errorThrown) {
-				toastr.error(errorThrown);
+				toastr.error(errorThrown.responseText);
 			}
 	
 	});
@@ -1294,7 +1288,6 @@ function loadEditUser() {
 	});
 }
 
-
 function fillUserEditFields(user) {
 	$("#validationFirst").hide();
 	$("#validationLast").hide();
@@ -1303,10 +1296,14 @@ function fillUserEditFields(user) {
 	$("#firstName").val(user.firstName);
 	$("#lastName").val(user.lastName);
 	$("#email").val(user.email);
-	$("#organization").val(user.organization);
-	$("#organization").prop( "disabled", true );
-}
+	if (loggedUser.role == 'superadmin') {
+		$("#organization").val(user.organization);
+		$("#organization").prop( "disabled", true );	}
+	else {
+		$("#orgform").hide();
+	}
 
+}
 
 function editUser() {
 	var obj = {};
@@ -1349,7 +1346,6 @@ function editUser() {
 		return false;
 	}
 
-	
 	$.post({
 		url : "rest/users/updateUser",
 		contentType : 'application/json',
@@ -1357,13 +1353,17 @@ function editUser() {
 		data : JSON.stringify(obj),
 		success : function(user) {
 				toastr.success("You've successfully updated user!");
-        		getUsers(); 
+				if (loggedUser.role == 'admin') {
+					getUsersByOrganization();
+				}
+				else {
+					showUsers(users);
+				} 
 		},
 		error: function(errorThrown ){
-			toastr.error( errorThrown );
+			toastr.error(errorThrown.responseText);
 		}
 	});
-   
 }
 
 function searchUsers() {
@@ -1379,7 +1379,7 @@ function searchUsers() {
 			showUsers(users);
 		},
 		error : function(errorThrown) {
-			toastr.error(errorThrown);
+			toastr.error(errorThrown.responseText);
 		}
 	});
 }
@@ -1392,7 +1392,7 @@ function getCategories() {
 			showCategories(categories);
 		},
 		error : function(errorThrown) {
-			toastr.error(errorThrown);
+			toastr.error(errorThrown.responseText);
 		}
 	});
 }
@@ -1430,9 +1430,6 @@ function addCategoryTr(category){
 	$('#vmcategory_table tbody').append(tr);
 	document.getElementById(buttonEditId).addEventListener("click", loadEditCategory);
 	document.getElementById(buttonDelId).addEventListener("click", deleteCategory);
-
-
-
 }
 
 function loadAddVmCategory() {
@@ -1442,7 +1439,6 @@ function loadAddVmCategory() {
 		$("#validationCores").hide();
 		$("#validationRam").hide();
 		$("#validationGpu").hide();
-		
 	});
 }
 
@@ -1530,12 +1526,10 @@ function addCategory() {
 			}
 		},
 		error: function(errorThrown ){
-			toastr.error( errorThrown );
+			toastr.error(errorThrown.responseText);
 		}
 	});
-	
 }
-
 
 function deleteCategory() {
 	var button_id = this.id;
@@ -1552,7 +1546,7 @@ function deleteCategory() {
 			showCategories(categories);
 		},
 		error : function(errorThrown) {
-			toastr.error(errorThrown);
+			toastr.error(errorThrown.responseText);
 		}
 	});
 }
@@ -1575,13 +1569,11 @@ function loadEditCategory() {
 				fillEditFieldsCategory(category);
 			},
 			error : function(errorThrown) {
-				toastr.error(errorThrown);
+				toastr.error(errorThrown.responseText);
 			}
-	
 	});
-		$("#add_vmcategory").on("click", editCategory);
 		
-		
+	$("#add_vmcategory").on("click", editCategory);	
 	});
 }
 
@@ -1661,8 +1653,7 @@ function editCategory() {
 		toastr.error("GPU has to be bigger than 0!");
 		return false;
 	}
-
-
+	
 	$.post({
 		url : "rest/vmcategories/update",
 		contentType : 'application/json',
@@ -1680,10 +1671,9 @@ function editCategory() {
 			}
 		},
 		error: function(errorThrown ){
-			toastr.error( errorThrown );
+			toastr.error(errorThrown.responseText);
 		}
 	});
-	
 }
 
 function searchCategories() {
@@ -1699,12 +1689,10 @@ function searchCategories() {
 			showCategories(categories);
 		},
 		error : function(errorThrown) {
-			toastr.error(errorThrown);
+			toastr.error(errorThrown.responseText);
 		}
 	});
 }
-
-
 
 function getDisks() {
 	searchResults = [];
@@ -1716,7 +1704,7 @@ function getDisks() {
 			showDisks(disks);
 		},
 		error : function(errorThrown) {
-			toastr.error(errorThrown);
+			toastr.error(errorThrown.responseText);
 		}
 	});
 }
@@ -1726,20 +1714,31 @@ function showDisks(disks) {
 	$("#search-button").show();
 	if (disks.length > 0) {
 		$("#div_center").load("html/disks.html", function() {
+			if (loggedUser.role == "user") {
+				$("#load_add_disk").hide();
+			}
+			else {
+				$("#load_add_disk").on("click", loadAddDisk);
+			}
 			for (let disk of disks) {
 				addDiskTr(disk);
 			}
 		});	
 	}
 	else {
-		$("#div_center").load("html/no_disks.html");
+		$("#div_center").load("html/no_disks.html", function () {
+			if (loggedUser.role == "user") {
+				$("#load_add_disk").hide();
+			}
+			else {
+				$("#load_add_disk").on("click", loadAddDisk);
+			}
+		});
 	}
 	$("#search-button").off().on("click", searchDisks);
 	$("#filter_disks").on("click", filterDisks);
 	$("#load_add_disk").on("click", loadAddDisk);
 }
-
-
 
 function addDiskTr(disk){
 	let tr = $('<tr class="text-center"></tr>');
@@ -1759,8 +1758,6 @@ function addDiskTr(disk){
 	$('#disks_table tbody').append(tr);
 	document.getElementById(buttonEditId).addEventListener("click", loadEditDisk);
 	document.getElementById(buttonDelId).addEventListener("click", deleteDisk);
-
-
 }
 
 function loadAddDisk() {
@@ -1771,7 +1768,7 @@ function loadAddDisk() {
 		$("#validationVM").hide();
 		$("#validationCapacity").hide();
 		$("#validationType").hide();
-		$("#button_add_disk").on("click", addDisk);
+		$("#button_add_disk").off().on("click", addDisk);
 		$.get({
 			url : 'rest/organizations/getAllNames',
 			dataType : 'json',
@@ -1815,12 +1812,10 @@ $(document).on("change", "#selectOrganization", function(){
            
 		},
 		error : function(errorThrown) {
-			toastr.error(errorThrown);
+			toastr.error(errorThrown.responseText);
 		}
 });
 });
-
-
 
 function addDisk() {
 		
@@ -1899,16 +1894,19 @@ function addDisk() {
 			}
 			else if (data == "success")
 			{
-				toastr.success("You've successfully added new disk!");
-        		getDisks(); 
+				toastr.success("You've successfully added disk!");
+				if (loggedUser.role == 'superadmin') {
+					getDisks();
+				}
+				else {
+					getDisksByOrganization();
+				}
 			}
 		},
 		error: function(errorThrown ){
-			toastr.error( errorThrown );
+			toastr.error(errorThrown.responseText);
 		}
-	});
-	
-	
+	});	
 }
 
 function deleteDisk() {
@@ -1923,10 +1921,16 @@ function deleteDisk() {
 		dataType : 'json',
 		data : JSON.stringify(obj),
 		success : function(disks) {
-			showDisks(disks);
+			toastr.success("You've successfully deleted disk!");
+			if (loggedUser.role == 'superadmin') {
+				getDisks();
+			}
+			else {
+				getDisksByOrganization();
+			}
 		},
 		error : function(errorThrown) {
-			toastr.error(errorThrown);
+			toastr.error(errorThrown.responseText);
 		}
 	});
 }
@@ -1949,7 +1953,7 @@ function loadEditDisk() {
 				fillEditFieldsDisk(disk);
 			},
 			error : function(errorThrown) {
-				toastr.error(errorThrown);
+				toastr.error(errorThrown.responseText);
 			}
 	
 	});
@@ -1995,17 +1999,15 @@ function fillEditFieldsDisk(disk) {
             
 		},
 		error : function(errorThrown) {
-			toastr.error(errorThrown);
+			toastr.error(errorThrown.responseText);
 		}
-});
+	});
 	if (disk.virtualMachine == "") {
 		$("#selectVM").val("not connected").change();
 	}
 	else {
 		$("#selectVM").val(disk.virtualMachine.split(".")[0]).change();
 	}
-
-	
 }
 
 function editDisk() {
@@ -2076,15 +2078,19 @@ function editDisk() {
 			}
 			else (data == "success")
 			{
-				toastr.success("Update was successful!");
-        		getDisks(); 
+				toastr.success("You've successfully added disk!");
+				if (loggedUser.role == 'superadmin') {
+					getDisks();
+				}
+				else {
+					getDisksByOrganization();
+				}
 			}
 		},
 		error: function(errorThrown ){
-			toastr.error( errorThrown );
+			toastr.error(errorThrown.responseText);
 		}
 	});
-	
 }
 
 function searchDisks() {
@@ -2110,7 +2116,7 @@ function searchDisks() {
 			}
 		},
 		error : function(errorThrown) {
-			toastr.error(errorThrown);
+			toastr.error(errorThrown.responseText);
 		}
 	});
 }
@@ -2134,7 +2140,6 @@ function filterDisks(){
 		return false;
 	}
 	
-	
 	$.ajax({
 		url : 'rest/disks/filter',
 		type : 'POST',
@@ -2151,10 +2156,10 @@ function filterDisks(){
 			}
 		},
 		error : function(errorThrown) {
-			toastr.error(errorThrown);
+			toastr.error(errorThrown.responseText);
 		}
 	});
-	}
+}
 
 
 function validateNumber(evt) {
@@ -2199,7 +2204,7 @@ $(document).on("change", "#vmOffOn", function(){
 				}
 			},
 			error: function(errorThrown ){
-				toastr.error( errorThrown );
+				toastr.error(errorThrown.responseText);
 			}
 		});
 	}
@@ -2217,7 +2222,7 @@ function getVirtualMachinesByOrganization() {
 			showVirtualMachines(vms);
 		},
 		error : function(errorThrown) {
-			toastr.error(errorThrown);
+			toastr.error(errorThrown.responseText);
 		}
 	});
 }
@@ -2230,7 +2235,7 @@ function getUsersByOrganization() {
 			showUsers(users);
 		},
 		error : function(errorThrown) {
-			toastr.error(errorThrown);
+			toastr.error(errorThrown.responseText);
 		}
 	});
 }
@@ -2245,14 +2250,10 @@ function getDisksByOrganization() {
 			showDisks(disks);
 		},
 		error : function(errorThrown) {
-			toastr.error(errorThrown);
+			toastr.error(errorThrown.responseText);
 		}
 	});
 }
-
-
-
-
 
 
 ////////////////////////////////////

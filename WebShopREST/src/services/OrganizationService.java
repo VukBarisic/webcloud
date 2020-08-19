@@ -21,6 +21,8 @@ import javax.ws.rs.core.Response;
 
 import helpers.HelperMethods;
 import model.Organization;
+import model.Role;
+import model.User;
 import repository.OrganizationRepository;
 
 @Path("/organizations")
@@ -28,14 +30,22 @@ public class OrganizationService {
 
 	@Context
 	HttpServletRequest request;
+	
+	User loggedUser;
 
 	@POST
 	@Path("/add")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addOrganization(HashMap<String, String> data) {
+		
+		loggedUser = (User) request.getSession().getAttribute("user");
+		
+		if (loggedUser == null || loggedUser.getRole().equals(Role.user)) {
+			return Response.status(403).entity(HelperMethods.GetJsonValue("Unauthorized")).build();
+		}
 		if (!OrganizationRepository.isUniqueOrg(data.get("name"))) {
-			return Response.status(200).entity("existError").build();
+			return Response.status(200).entity(HelperMethods.GetJsonValue("existError")).build();
 		}
 		String organizationJson = OrganizationRepository.saveOrganization(data.get("name"), data.get("description"));
 		request.getSession().setAttribute("organization", data.get("name"));
@@ -51,6 +61,7 @@ public class OrganizationService {
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Produces(MediaType.APPLICATION_JSON)
 	public String uploadImage(InputStream is) throws IOException {
+		
 		String name = (String) request.getSession().getAttribute("organization");
 		String imageName = name.replaceAll("\\s", "") + ".jpg";
 
@@ -77,6 +88,11 @@ public class OrganizationService {
 	@Path("/getAll")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getOrganizations() {
+		loggedUser = (User) request.getSession().getAttribute("user");
+		
+		if (loggedUser == null || !loggedUser.getRole().equals(Role.superadmin)) {
+			return Response.status(403).entity(HelperMethods.GetJsonValue("Unauthorized")).build();
+		}
 		ArrayList<Organization> organizations = OrganizationRepository.getOrganizations();
 
 		return Response.status(200).entity(organizations).build();
@@ -87,6 +103,11 @@ public class OrganizationService {
 	@Path("/getAllNames")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getOrganizationsNames() {
+		loggedUser = (User) request.getSession().getAttribute("user");
+		
+		if (loggedUser == null) {
+			return Response.status(403).entity(HelperMethods.GetJsonValue("Unauthorized")).build();
+		}
 		List<String> organizations = OrganizationRepository.getOrganizationsNames();
 
 		return Response.status(200).entity(organizations).build();
@@ -98,6 +119,11 @@ public class OrganizationService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response delete(HashMap<String, String> data) {
+		loggedUser = (User) request.getSession().getAttribute("user");
+		
+		if (loggedUser == null || loggedUser.getRole().equals(Role.user)) {
+			return Response.status(403).entity(HelperMethods.GetJsonValue("Unauthorized")).build();
+		}
 		String name = data.get("name");
 		if (OrganizationRepository.deleteOrganization(name)) {
 			return Response.status(200).entity(OrganizationRepository.getOrganizations()).build();
@@ -111,6 +137,11 @@ public class OrganizationService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response searchOrganization(HashMap<String, String> data) {
+		loggedUser = (User) request.getSession().getAttribute("user");
+		
+		if (loggedUser == null || !loggedUser.getRole().equals(Role.superadmin)) {
+			return Response.status(403).entity(HelperMethods.GetJsonValue("Unauthorized")).build();
+		}
 		String name = data.get("name");
 		return Response.status(200).entity(OrganizationRepository.searchOrganizations(name)).build();
 
@@ -121,6 +152,11 @@ public class OrganizationService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getbyName(HashMap<String, String> data) {
+		loggedUser = (User) request.getSession().getAttribute("user");
+		
+		if (loggedUser == null) {
+			return Response.status(403).entity(HelperMethods.GetJsonValue("Unauthorized")).build();
+		}
 		Organization organization = OrganizationRepository.findByName(data.get("name"));
 		if (organization == null) return Response.status(400).entity("Error getting organization").build();
 		return Response.status(200).entity(organization).build();
@@ -132,8 +168,14 @@ public class OrganizationService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateOrganization(HashMap<String, String> data) {
+		
+		loggedUser = (User) request.getSession().getAttribute("user");
+		
+		if (loggedUser == null || loggedUser.getRole().equals(Role.user)) {
+			return Response.status(403).entity(HelperMethods.GetJsonValue("Unauthorized")).build();
+		}
 		if (!data.get("name").equals(data.get("oldName")) && !OrganizationRepository.isUniqueOrg(data.get("name"))) {
-			return Response.status(200).entity("existError").build();
+			return Response.status(200).entity(HelperMethods.GetJsonValue("existError")).build();
 		}
 		boolean condition = !OrganizationRepository.updateOrganization(data);
 		if (condition) {
@@ -147,6 +189,11 @@ public class OrganizationService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response calculateMonthlyBill(HashMap<String, String> data) {
+		loggedUser = (User) request.getSession().getAttribute("user");
+		
+		if (loggedUser == null || !loggedUser.getRole().equals(Role.admin)) {
+			return Response.status(403).entity(HelperMethods.GetJsonValue("Unauthorized")).build();
+		}
 		double price = 0;
 		price = OrganizationRepository.calculateMonthlyBill(data.get("organization"), data.get("selectedMonth"));
 		

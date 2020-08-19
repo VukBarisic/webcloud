@@ -16,6 +16,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import helpers.HelperMethods;
+import model.Role;
+import model.User;
 import model.VMcategory;
 
 import repository.VmCategoryRepository;
@@ -24,16 +26,24 @@ import repository.VmCategoryRepository;
 public class VmCategoryService {
 	@Context
 	HttpServletRequest request;
+	
+	User loggedUser;
 
 	@POST
 	@Path("/add")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addVmCategory(HashMap<String, String> data) {
+		
+		loggedUser = (User) request.getSession().getAttribute("user");
+		
+		if (loggedUser == null || loggedUser.getRole().equals(Role.user)) {
+			return Response.status(403).entity(HelperMethods.GetJsonValue("Unauthorized")).build();
+		}
 
 		boolean success = VmCategoryRepository.saveVmCategory(data);
 		if (!success) {
-			return Response.status(400).entity(HelperMethods.GetJsonValue("Vm category name already exists")).build();
+			return Response.status(200).entity(HelperMethods.GetJsonValue("existError")).build();
 		}
 		return Response.status(200).entity(HelperMethods.GetJsonValue("success")).build();
 
@@ -43,6 +53,12 @@ public class VmCategoryService {
 	@Path("/getAll")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getVmCategories() {
+		
+		loggedUser = (User) request.getSession().getAttribute("user");
+		
+		if (loggedUser == null || !loggedUser.getRole().equals(Role.superadmin)) {
+			return Response.status(403).entity(HelperMethods.GetJsonValue("Unauthorized")).build();
+		}
 		ArrayList<VMcategory> vMcategories = VmCategoryRepository.getVmCategories();
 
 		return Response.status(200).entity(vMcategories).build();
@@ -54,6 +70,12 @@ public class VmCategoryService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteVirtualMachine(HashMap<String, String> data) {
+		
+		loggedUser = (User) request.getSession().getAttribute("user");
+		
+		if (loggedUser == null || loggedUser.getRole().equals(Role.user)) {
+			return Response.status(403).entity(HelperMethods.GetJsonValue("Unauthorized")).build();
+		}
 		String name = data.get("name");
 		if (VmCategoryRepository.deleteVmCategory(name)) {
 			return Response.status(200).entity(VmCategoryRepository.getVmCategories()).build();
@@ -66,6 +88,12 @@ public class VmCategoryService {
 	@Path("/getAllNames")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getCategoriesNames() {
+		
+		loggedUser = (User) request.getSession().getAttribute("user");
+		
+		if (loggedUser == null) {
+			return Response.status(403).entity(HelperMethods.GetJsonValue("Unauthorized")).build();
+		}
 		List<String> categories = VmCategoryRepository.getCategoriesNames();
 
 		return Response.status(200).entity(categories).build();
@@ -77,9 +105,16 @@ public class VmCategoryService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getbyName(HashMap<String, String> data) {
+		
+		loggedUser = (User) request.getSession().getAttribute("user");
+		
+		if (loggedUser == null) {
+			return Response.status(403).entity(HelperMethods.GetJsonValue("Unauthorized")).build();
+		}
+		
 		VMcategory vMcategory = VmCategoryRepository.getCategoryByName(data.get("name"));
 		if (vMcategory == null)
-			return Response.status(400).entity("Error getting category").build();
+			return Response.status(400).entity(HelperMethods.GetJsonValue("Error getting category")).build();
 		return Response.status(200).entity(vMcategory).build();
 
 	}
@@ -89,9 +124,15 @@ public class VmCategoryService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateCategory(HashMap<String, String> data) {
+		
+		loggedUser = (User) request.getSession().getAttribute("user");
+		
+		if (loggedUser == null || loggedUser.getRole().equals(Role.user)) {
+			return Response.status(403).entity(HelperMethods.GetJsonValue("Unauthorized")).build();
+		}
 		if (!data.get("oldName").equals(data.get("name"))
 				&& !VmCategoryRepository.isUniqueVmCategory(data.get("name"))) {
-			return Response.status(200).entity("existError").build();
+			return Response.status(200).entity(HelperMethods.GetJsonValue("existError")).build();
 		}
 		boolean success = VmCategoryRepository.updateCategory(data);
 		if (!success) {
