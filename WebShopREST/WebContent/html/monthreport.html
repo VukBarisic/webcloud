@@ -3,13 +3,21 @@
 	display: none;
 }
 </style>
-<label for="minMonthsPicker">Pick month</label>
-<div class="form-group">
-	<input type="text" class="form-control" id="monthPicker" class="datepicker"
-		data-date-format="mm/yyyy" readonly="readonly"/>
-</div>
 
-<div class="text-center">
-	<button type="button" id="calculatePrice" class="btn btn-primary ">Calculate
-		Monthly bill</button>
+<div class="container">
+
+	<div class="row justify-content-center">
+		<div class="col-md-6">
+			<div class="form-group">
+			<label for="minMonthsPicker">Pick month</label>
+				<input type="text" class="form-control" id="monthPicker"
+					class="datepicker" data-date-format="mm/yyyy" readonly="readonly" />
+			</div>
+
+			<div class="text-center">
+				<button type="button" id="calculatePrice" class="btn btn-primary ">Calculate
+					Monthly bill</button>
+			</div>
+		</div>
+	</div>
 </div>

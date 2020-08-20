@@ -84,6 +84,11 @@ function calculatePrice(){
 	var obj = {};
 	obj["selectedMonth"] = "01/" + $("#monthPicker").val() + " 00:00:00";
 	obj["organization"] = loggedUser.organization;
+	
+	if ($("#monthPicker").val() == "") {
+		toastr.error("Please pick a month");
+		return false;
+	}
 
 	
 	$.post({
