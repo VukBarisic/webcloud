@@ -104,8 +104,15 @@ public class DiskRepository {
 		return false;
 	}
 
-	public static List<Disk> searchDisks(String name) {
-		List<Disk> disks = getDisks().stream().filter(disk -> disk.getName().toLowerCase().contains(name.toLowerCase()))
+	public static List<Disk> searchDisks(String name, String organization) {
+		List<Disk> disks = new ArrayList<>();
+		if (organization == "") {
+			disks = getDisks();
+		}
+		else {
+			disks = getDisksByCompany(organization);
+		}
+		disks = disks.stream().filter(disk -> disk.getName().toLowerCase().contains(name.toLowerCase()))
 				.collect(Collectors.toList());
 		return disks;
 	}
@@ -139,8 +146,14 @@ public class DiskRepository {
 		}
 	}
 
-	public static List<Disk> filterDisks(HashMap<String, String> data) {
-		List<Disk> disks = getDisks();
+	public static List<Disk> filterDisks(HashMap<String, String> data, String organization) {
+		List<Disk> disks = new ArrayList<>();
+		if (organization == "") {
+			disks = getDisks();
+		}
+		else {
+			disks = getDisksByCompany(organization);
+		}
 		int capacityFrom = Integer.parseInt(data.get("capacityFrom"));
 		int capacityTo = Integer.parseInt(data.get("capacityTo"));
 		disks = disks.stream().filter(disk -> disk.getCapacity() > capacityFrom && disk.getCapacity() < capacityTo)

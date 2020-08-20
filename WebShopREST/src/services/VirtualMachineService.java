@@ -93,11 +93,11 @@ public class VirtualMachineService {
 	public Response searchVirtualMachines(HashMap<String, String> data) {
 		loggedUser = (User) request.getSession().getAttribute("user");
 		
-		if (loggedUser == null || !loggedUser.getRole().equals(Role.superadmin)) {
+		if (loggedUser == null) {
 			return Response.status(403).entity(HelperMethods.GetJsonValue("Unauthorized")).build();
 		}
 		String name = data.get("name");
-		return Response.status(200).entity(VmRepository.searchVirtualMachines(name)).build();
+		return Response.status(200).entity(VmRepository.searchVirtualMachines(name, loggedUser.getOrganization())).build();
 	}
 
 	@POST
@@ -149,10 +149,10 @@ public class VirtualMachineService {
 	public Response filterVirtualMachines(HashMap<String, String> data) {
 		loggedUser = (User) request.getSession().getAttribute("user");
 		
-		if (loggedUser == null || !loggedUser.getRole().equals(Role.superadmin)) {
+		if (loggedUser == null) {
 			return Response.status(403).entity(HelperMethods.GetJsonValue("Unauthorized")).build();
 		}
-		return Response.status(200).entity(VmRepository.filterVirtualMachines(data)).build();
+		return Response.status(200).entity(VmRepository.filterVirtualMachines(data, loggedUser.getOrganization())).build();
 	}
 	
 	

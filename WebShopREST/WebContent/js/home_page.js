@@ -282,6 +282,7 @@ function logout() {
 		success : function(data) {
 			if (data) {
 				success = data;
+				 $("#search-input").val('');
 				toastr.success("GoodBye");
 			} else {
 				toastr.error("Error!");
@@ -657,16 +658,24 @@ function addVirtualMachineTr(virtualMachine){
 	let organization = $('<td>' + virtualMachine.organization + '</td>');
 	var buttonDelId = "del_" + virtualMachine.name;
 	var buttonEditId = "edit_" + virtualMachine.name;
-	let tdButtons = $('<td><button type="button" id = "' + buttonEditId + '" data-toggle="modal" class="btn btn-warning btn-rounded btn-sm my-0"><i class="fa fa-edit"></i></button><button type="button" id = "' + buttonDelId + '" class="btn btn-danger btn-rounded btn-sm my-0"><i class="fa fa-times" aria-hidden="true"></i></button></td>');
+	let buttonEditHtml = '<button type="button" id = "' + buttonEditId + '" data-toggle="modal" class="btn btn-warning btn-rounded btn-sm my-0"><i class="fa fa-edit"></i></button>';
+	let buttonDelHtml = '<button type="button" id = "' + buttonDelId + '" class="btn btn-danger btn-rounded btn-sm my-0"><i class="fa fa-times" aria-hidden="true"></i></button>';
+	let tdButtons;
+	if (loggedUser.role == 'user') {
+		tdButtons = $('<td>' + buttonEditHtml + '</td>');
+		$("#vmTable th:nth-child(6)").html("Details");
+	}
+	else {
+		tdButtons = $('<td>' + buttonEditHtml + buttonDelHtml + '</td>');
+	}
+
 	
 	tr.append(tdName).append(tdCores).append(tdRam).append(tdGpuCores).append(organization).append(tdButtons);
 	$('#vmTable tbody').append(tr);
-	if (loggedUser.role == "user") {
-		$("#"+ buttonDelId).hide();
-	}
 	document.getElementById(buttonEditId).addEventListener("click", loadEditVm);
-	document.getElementById(buttonDelId).addEventListener("click", deleteVm);
-
+	if (loggedUser.role != "user") {
+		document.getElementById(buttonDelId).addEventListener("click", deleteVm);
+	}
 }
 
 function loadAddVm() {
@@ -815,6 +824,15 @@ function loadEditVm() {
 	obj["name"] = name;
 	oldName = name;
 	$("#div_center").load("html/edit_vm.html", function() {
+		if (loggedUser.role == "user") {
+			$("#edit_vm").hide();
+			$("#turnvmdiv").hide();
+			$("#vmname").prop("disabled", true);
+			$("#selectCategory").prop("disabled", true);
+		}
+		else {
+			$("#edit_vm").on("click", loadAddVm);
+		}
 		
 		$.post({
 			url : 'rest/vms/getByName',
@@ -843,7 +861,18 @@ function fillEditFieldsVm(vm) {
 	$("#organization").val(vm.organization)
 	$("#edit_vm").html("Update vm")
 	if (vm.activities.length != 0 && vm.activities[vm.activities.length-1].dateTurnedOff == null) {
-		$("#vmOffOn").prop('checked', true);
+		if (loggedUser.role == "user") {
+			$("#updateVm").append("<p> "+ $("#vmname").val() + " is turned on. </p>");
+		}
+		else {
+			$("#vmOffOn").prop('checked', true);
+		}
+	}
+	else {
+		if (loggedUser.role == "user") {
+			$("#updateVm").append("<p> "+ $("#vmname").val() + " is turned off. </p>");
+		}
+		
 	}
 	var obj = {};
 	let index = 0;
@@ -1298,7 +1327,8 @@ function fillUserEditFields(user) {
 	$("#email").val(user.email);
 	if (loggedUser.role == 'superadmin') {
 		$("#organization").val(user.organization);
-		$("#organization").prop( "disabled", true );	}
+		$("#organization").prop( "disabled", true );
+		}
 	else {
 		$("#orgform").hide();
 	}
@@ -1752,12 +1782,23 @@ function addDiskTr(disk){
 	}
 	var buttonDelId = "del_" + disk.name;
 	var buttonEditId = "edit_" + disk.name;
-	let tdButtons = $('<td><button type="button" id = "' + buttonEditId + '" data-toggle="modal" class="btn btn-warning btn-rounded btn-sm my-0"><i class="fa fa-edit"></i></button><button type="button" id = "' + buttonDelId + '" class="btn btn-danger btn-rounded btn-sm my-0"><i class="fa fa-times" aria-hidden="true"></i></button></td>');
+	let buttonEditHtml = '<button type="button" id = "' + buttonEditId + '" data-toggle="modal" class="btn btn-warning btn-rounded btn-sm my-0"><i class="fa fa-edit"></i></button>';
+	let buttonDelHtml = '<button type="button" id = "' + buttonDelId + '" class="btn btn-danger btn-rounded btn-sm my-0"><i class="fa fa-times" aria-hidden="true"></i></button>';
+	let tdButtons;
+	if (loggedUser.role == 'user') {
+		tdButtons = $('<td>' + buttonEditHtml + '</td>');
+		$("#disks_table th:nth-child(6)").html("Details");
+	}
+	else {
+		tdButtons = $('<td>' + buttonEditHtml + buttonDelHtml + '</td>');
+	}
 
 	tr.append(tdName).append(tdType).append(tdCapacity).append(tdOrganization).append(tdVM).append(tdButtons);
 	$('#disks_table tbody').append(tr);
 	document.getElementById(buttonEditId).addEventListener("click", loadEditDisk);
-	document.getElementById(buttonDelId).addEventListener("click", deleteDisk);
+	if (loggedUser.role != 'user') {
+		document.getElementById(buttonDelId).addEventListener("click", deleteDisk);
+	}
 }
 
 function loadAddDisk() {
@@ -1943,7 +1984,17 @@ function loadEditDisk() {
 	obj["name"] = name;
 	oldName = name;
 	$("#div_center").load("html/edit_disk.html", function() {
-		
+		if (loggedUser.role == "user") {
+			$("#button_edit_disk").hide();
+			$("#name").prop( "disabled", true);
+			$("#capacity").prop( "disabled", true);
+			$("#selectVM" ).prop( "disabled", true );
+			$("input[name=diskType]").prop("disabled",true);
+
+		}
+		else {
+			$("#button_edit_disk").on("click", editDisk);
+		}
 		$.post({
 			url : 'rest/disks/getByName',
 			contentType : 'application/json',
@@ -1956,9 +2007,7 @@ function loadEditDisk() {
 				toastr.error(errorThrown.responseText);
 			}
 	
-	});
-		$("#button_edit_disk").on("click", editDisk);
-		
+	});		
 	});
 }
 
@@ -1985,7 +2034,7 @@ function fillEditFieldsDisk(disk) {
 			var len = vms.length;
 			$("#selectVM").empty();
 			if (len>0){
-				$( "#selectVM" ).prop( "disabled", false );
+				//$( "#selectVM" ).prop( "disabled", false );
 				for( var i = 0; i<len; i++){
 	                var vm = vms[i].split(".")[0];
 	                $('#selectVM').append("<option value='"+vm+"'>"+vm+"</option>");

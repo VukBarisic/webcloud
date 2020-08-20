@@ -33,11 +33,6 @@ public class VmRepository {
 							"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\virtualmachines.json")
 							.toFile(), VirtualMachine[].class)));
 
-			/*
-			 * List<VirtualMachine> vms = virtualMachines.stream() .filter(virtualMachine ->
-			 * virtualMachine.getActivities().equals(null)) .peek(vm -> vm.setActivities(new
-			 * ArrayList<>())).collect(Collectors.toList()); //
-			 */
 			return virtualMachines;
 
 		} catch (Exception e) {
@@ -121,8 +116,15 @@ public class VmRepository {
 		return true;
 	}
 
-	public static List<VirtualMachine> searchVirtualMachines(String name) {
-		List<VirtualMachine> virtualMachines = getVirtualMachines().stream()
+	public static List<VirtualMachine> searchVirtualMachines(String name, String organization) {
+		List<VirtualMachine> vms = new ArrayList<>();
+		if (organization == "") {
+			vms = getVirtualMachines();
+		}
+		else {
+			vms = getVirtualMachinesByCompany(organization);
+		}
+		List<VirtualMachine> virtualMachines = vms.stream()
 				.filter(vm -> vm.getName().toLowerCase().contains(name.toLowerCase())).collect(Collectors.toList());
 		return virtualMachines;
 	}
@@ -176,8 +178,15 @@ public class VmRepository {
 		}
 	}
 
-	public static List<VirtualMachine> filterVirtualMachines(HashMap<String, String> data) {
-		List<VirtualMachine> virtualMachines = getVirtualMachines();
+	public static List<VirtualMachine> filterVirtualMachines(HashMap<String, String> data, String organization) {
+		
+		List<VirtualMachine> virtualMachines = new ArrayList<>();
+		if (organization == "") {
+			virtualMachines = getVirtualMachines();
+		}
+		else {
+			virtualMachines = getVirtualMachinesByCompany(organization);
+		}
 		if (!data.get("ramFrom").equals("")) {
 			int ramFrom = Integer.parseInt(data.get("ramFrom"));
 			int ramTo = Integer.parseInt(data.get("ramTo"));
