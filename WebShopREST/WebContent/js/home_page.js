@@ -96,13 +96,39 @@ function calculatePrice(){
 		contentType : 'application/json',
 		dataType : 'json',
 		data : JSON.stringify(obj),
-		success : function(price) {
-			$("#div_center").append("<p>The price for " + $("#monthPicker").val() + " is " + price + "$.</p>");
+		success : function(items) {
+				showReport(items, $("#monthPicker").val());
+			
 		},
 		error: function(errorThrown ){
 			toastr.error(errorThrown.responseText);
 		}
 	});
+}
+
+function showReport(items, month) {
+	let price = 0;
+	if (items.length > 0) {
+		$("#div_center").load("html/reporttable.html", function() {
+			for (let item of items) {
+				addReportItemTr(item);
+				price += item.price;
+			}
+			$("#div_center").append("<p>Price for " + month + " is " + price + "$.</p>")
+		});	
+	}
+	else {
+		$("#div_center").append("<p> No expenses for selected month</p>")
+	}
+}
+
+function addReportItemTr(item){
+	let tr = $('<tr class="text-center"></tr>');
+	let tdName = $('<td>' + item.name.split(".")[0] + '</td>');
+	let tdType = $('<td>' + item.type + '</td>');
+	let tdPrice = $('<td>' + Math.round(item.price * 100) / 100 + '</td>');
+	tr.append(tdName).append(tdType).append(tdPrice);
+	$('#reportTable tbody').append(tr);
 }
 
 function loadMyProfile() {
@@ -201,7 +227,13 @@ function editMyProfile() {
 		success : function(user) {
 				loggedUser = user;
 				toastr.success("You've successfully updated your profile!");
-        		getUsers(); 
+				if (loggedUser.role == 'superadmin') {
+					getUsers();
+				}
+				else if (loggedUser.role == 'admin') {
+					getUsersByOrganization();
+				}
+        		 
 		},
 		error: function(errorThrown ){
 			toastr.error(errorThrown.responseText);
@@ -287,7 +319,7 @@ function logout() {
 		success : function(data) {
 			if (data) {
 				success = data;
-				 $("#search-input").val('');
+				$("#search-input").val('');
 				toastr.success("GoodBye");
 			} else {
 				toastr.error("Error!");
@@ -567,7 +599,9 @@ function editOrganization() {
 			        	if(response == "success")
 			        	{
 			        		toastr.success("You've successfully updated organization!");
-			        		getOrganizations();
+			        		if (loggedUser.role == 'superadmin') {
+								getOrganizations();
+							}
 			        	}
 			        },
 					error: function(errorThrown){
@@ -577,7 +611,9 @@ function editOrganization() {
 			}
 			else if (data == "success") {
 				toastr.success("You've successfully updated organization!");
-        		getOrganizations();
+				if (loggedUser.role == 'superadmin') {
+					getOrganizations();
+				}
 			}
 		},
 		error: function(errorThrown ){
@@ -600,6 +636,7 @@ function searchOrganizations() {
 		dataType : 'json',
 		data : JSON.stringify(obj),
 		success : function(organizations) {
+			$("#search-input").val('');
 			showOrganizations(organizations);
 		},
 		error : function(errorThrown) {
@@ -988,6 +1025,7 @@ function searchVirtualMachines(){
 		data : JSON.stringify(obj),
 		success : function(vms) {
 			searchResults = vms;
+			$("#search-input").val('');
 			if (filterResults.length > 0) {
 				showVirtualMachines(filterSearchIntersection(searchResults, filterResults));
 			}
@@ -2162,6 +2200,7 @@ function searchDisks() {
 		data : JSON.stringify(obj),
 		success : function(disks) {
 			searchResults = disks;
+			$("#search-input").val('');
 			if (filterResults.length > 0) {
 				showDisks(filterSearchIntersection(searchResults, filterResults));
 			}

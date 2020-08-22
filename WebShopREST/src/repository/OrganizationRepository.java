@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import dto.ReportDto;
 import javafx.util.converter.LocalDateTimeStringConverter;
 import model.Activity;
 import model.Disk;
@@ -198,14 +199,15 @@ public class OrganizationRepository {
 		}
 	}
 
-	public static double calculateMonthlyBill(String organization, String selectedMonth) {
+	public static List<ReportDto> calculateMonthlyBill(String organization, String selectedMonth) {
+		List<ReportDto> reportItems = new ArrayList<>();
 		List<VirtualMachine> virtualMachines = VmRepository.getVirtualMachinesByCompany(organization);
 		List<Disk> disks = DiskRepository.getDisksByCompany(organization);
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 		LocalDateTime startOfMonth = LocalDateTime.parse(selectedMonth, formatter);
 		LocalDateTime endOfMonth = startOfMonth.with(TemporalAdjusters.firstDayOfNextMonth());
 		LocalDateTime today = LocalDateTime.now();
-
+		
 		double bill = 0;
 		for (Disk d : disks) {
 			if (d.getDiskType() == DiskType.HDD) {
@@ -213,6 +215,9 @@ public class OrganizationRepository {
 			} else if (d.getDiskType() == DiskType.SSD) {
 				bill += d.getCapacity() * 0.3;
 			}
+			ReportDto reportItem = new ReportDto(d.getName(), "disk", bill);
+			reportItems.add(reportItem);
+			bill = 0;
 		}
 		int hours = 0;
 		for (VirtualMachine vm : virtualMachines) {
@@ -258,10 +263,13 @@ public class OrganizationRepository {
 			}
 			bill += (vm.getvMcategory().getRam() * 15 + vm.getvMcategory().getNumberOfCores() * 25
 					+ vm.getvMcategory().getNumOfGpuCores()) * hours / 720;
+			ReportDto reportItem = new ReportDto(vm.getName(), "VM", bill);
+			reportItems.add(reportItem);
 			hours = 0;
+			bill = 0;
 		}
 
-		return bill;
+		return reportItems;
 
 	}
 }

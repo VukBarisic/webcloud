@@ -194,10 +194,8 @@ public class OrganizationService {
 		if (loggedUser == null || !loggedUser.getRole().equals(Role.admin)) {
 			return Response.status(403).entity(HelperMethods.GetJsonValue("Unauthorized")).build();
 		}
-		double price = 0;
-		price = OrganizationRepository.calculateMonthlyBill(data.get("organization"), data.get("selectedMonth"));
 		
-		return Response.status(200).entity(price).build();
+		return Response.status(200).entity(HelperMethods.GetJsonValue(OrganizationRepository.calculateMonthlyBill(data.get("organization"), data.get("selectedMonth")))).build();
 		
 		
 	}

@@ -146,7 +146,7 @@ public class DiskService {
 	public Response filterDisks(HashMap<String, String> data) {
 		loggedUser = (User) request.getSession().getAttribute("user");
 		
-		if (loggedUser == null || !loggedUser.getRole().equals(Role.superadmin)) {
+		if (loggedUser == null) {
 			return Response.status(403).entity(HelperMethods.GetJsonValue("Unauthorized")).build();
 		}
 		return Response.status(200).entity(DiskRepository.filterDisks(data, loggedUser.getOrganization())).build();
