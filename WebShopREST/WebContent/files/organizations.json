@@ -1,1 +1,32 @@
-[{"name":"Apple incorporated","description":"Apple company ","logo":"Appleincorporated.jpg","users":[],"resources":[]},{"name":"amazon corp","description":"amazon x","logo":"amazoncorp.jpg","users":[],"resources":["M90y.amazon incorp","Proba5.amazon corp","M90.amazon corp","Proba.amazon corp"]},{"name":"pixarc","description":"toy story","logo":"pixarc.jpg","users":[],"resources":[]},{"name":"Arsenal FC","description":"Arsenal football club from London 1886","logo":"ArsenalFC.jpg","users":[],"resources":["va.Arsenal FC"]}]
+[
+	{
+		"name": "Apple incorporate",
+		"description": "Apple company ",
+		"logo": "Appleincorporate.jpg",
+		"users": [],
+		"resources": []
+	},
+	{
+		"name": "Amazon",
+		"description": "amazon x",
+		"logo": "Amazon.jpg",
+		"users": [],
+		"resources": [
+			"M90.Amazon"
+		]
+	},
+	{
+		"name": "pixarc",
+		"description": "toy story",
+		"logo": "pixarc.jpg",
+		"users": [],
+		"resources": []
+	},
+	{
+		"name": "Arsenal Fc",
+		"description": "Arsenal football club from London 1886",
+		"logo": "ArsenalFc.jpg",
+		"users": [],
+		"resources": []
+	}
+]

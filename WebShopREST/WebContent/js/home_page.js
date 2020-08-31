@@ -6,7 +6,7 @@ var filterResults = [];
 
 document.addEventListener("DOMContentLoaded", function(){
 	loadHomePage();
-	});
+});
 
 function loadHomePage() {
 	loggedUser = getLoggedUser();
@@ -45,6 +45,7 @@ function byUserType() {
 		$("#organizations").hide();
 		$("#myOrganization").show();
 		$("#monthlyReport").show();
+		$("#users").show();
 		getVirtualMachinesByOrganization();
 		$("#home").off().on("click", getVirtualMachinesByOrganization);
 		$("#monthlyReport").off().on("click", loadMonthlyReport);
@@ -66,6 +67,8 @@ function byUserType() {
 }
 
 function loadMonthlyReport(){
+	$("#search-input").hide();
+	$("#search-button").hide();
 	$("#div_center").load("html/monthreport.html", function() {
 		$('#monthPicker').datepicker({
 			minViewMode:'months',
@@ -132,6 +135,8 @@ function addReportItemTr(item){
 }
 
 function loadMyProfile() {
+	$("#search-input").hide();
+	$("#search-button").hide();
 	$("#div_center").load("html/editMyProfile.html", function() {
 		$("#updateMyProfile").on("click", editMyProfile);
 		fillMyProfileFields();
@@ -214,6 +219,7 @@ function editMyProfile() {
 		$("#confirm_password").css("border-color","#ced4da");
 	}
 	
+	
 	if (!validate) {
 		toastr.error("All fields must be filled!");
 		return false;
@@ -244,6 +250,8 @@ function editMyProfile() {
 
 function loadLoginPage() {
 	$("#div_center").load("html/login.html", function() {
+		$("#validationEmail").hide();
+		$("#validationPass").hide();
 		$("#button_login").on("click", login);
 	});
 
@@ -255,27 +263,44 @@ function login() {
 	obj["email"] = $("#email_login").val();
 	obj["password"] = $('#password_login').val();
 
-	var submit = true;
+	var validate = true;
 
-	if (obj["email"]  == null || obj["email"]  == "") {
-		nameError = "Please enter your email";
-		document.getElementById("email_error").innerHTML = nameError;
-		submit = false;
+	if ($("#email_login").val() == "") {
+		 $("#validationEmail").show();
+		 $("#email_login").css("border-color","red");
+		 validate = false;
 	}
-
-	if (obj["password"]  == null || obj["password"] == "") {
-		emailError = "Field cant be empty";
-		document.getElementById("pass_email").innerHTML = emailError;
-		submit = false;
+	else{
+		$("#validationEmail").hide();
+		$("#email_login").css("border-color","#ced4da");
 	}
-	if (submit) {
+	if ($("#password_login").val() == "") {
+		 $("#validationPass").show();
+		 $("#password_login").css("border-color","red");
+		 validate = false;
+	}
+	else {
+		$("#validationPass").hide();
+		$("#password_login").css("border-color","#ced4da");
+	}
+	
+	if (!validate) {
+		toastr.error("Email or password field is empty!");
+		return false;
+	}
+	
+	if (!validateEmail(obj["email"])) {
+		 $("#email_login").css("border-color","red");
+		 toastr.error("You have to enter valid email!");
+		 return false;
+	}
 		$.post({
 			url : "rest/users/login",
 			contentType : 'application/json',
 			dataType : 'json',
 			data : JSON.stringify(obj),
 			success : function(user) {
-					toastr.success('Welcome ' + user.email);
+					toastr.success('Welcome ' + user.firstName + " " + user.lastName + "!");
 					loadHomePage()
 			
 			},
@@ -283,7 +308,6 @@ function login() {
 				toastr.error(errorThrown.responseText);
 			}
 		});
-	}
 }
 
 function getLoggedUser() {
@@ -381,6 +405,8 @@ function addOrganizationTr(organization){
 }
 
 function loadAddOrganization() {
+	$("#search-input").hide();
+	$("#search-button").hide();
 	$("#div_center").load("html/add_organization.html", function() {
 		$("#button_add_org").on("click", addOrganization);
 		$("#validationName").hide();
@@ -475,18 +501,25 @@ function deleteOrganization() {
 	var name = splitted[1];
 	var obj = {};
 	obj["name"] = name;
-	$.post({
-		url : 'rest/organizations/delete',
-		contentType : 'application/json',
-		dataType : 'json',
-		data : JSON.stringify(obj),
-		success : function(organizations) {
-			showOrganizations(organizations);
-		},
-		error : function(errorThrown) {
-			toastr.error(errorThrown.responseText);
-		}
-	});
+	var sure;
+	if (!this.clicked) {
+        sure = confirm("Are you sure you want to delete this organization?");
+        this.checked = !sure;
+    }
+	if (sure) {
+		$.post({
+			url : 'rest/organizations/delete',
+			contentType : 'application/json',
+			dataType : 'json',
+			data : JSON.stringify(obj),
+			success : function(organizations) {
+				showOrganizations(organizations);
+			},
+			error : function(errorThrown) {
+				toastr.error(errorThrown.responseText);
+			}
+		});
+	}
 }
 
 function loadEditOrganization() {
@@ -494,6 +527,8 @@ function loadEditOrganization() {
 	var splitted = button_id.split('_');
 	var name = splitted[1];
 	var obj = {};
+	$("#search-input").hide();
+	$("#search-button").hide();
 	if (loggedUser.role == "superadmin") {
 		obj["name"] = name;
 		oldName = name;
@@ -502,7 +537,8 @@ function loadEditOrganization() {
 		obj["name"] = loggedUser.organization;
 		oldName = loggedUser.organization;
 	}
-	
+	$("#search-input").hide();
+	$("#search-button").hide();
 	
 	$("#div_center").load("html/editOrganization.html", function() {
 		
@@ -721,7 +757,8 @@ function addVirtualMachineTr(virtualMachine){
 }
 
 function loadAddVm() {
-	
+	$("#search-input").hide();
+	$("#search-button").hide();
 	$("#div_center").load("html/add_vm.html", function() {
 		$("#validationName").hide();
 		$("#validationCat").hide();
@@ -829,6 +866,11 @@ function addVirtualMachine() {
 		toastr.error("All fields must be filled!");
 		return false;
 	}
+	
+	if (validateSpecialChars(obj["name"])) {
+		toastr.error("Special chars are not allowed!");
+		return false;
+	}
 
 	$.post({
 		url : "rest/vms/add",
@@ -865,6 +907,8 @@ function loadEditVm() {
 	var obj = {};
 	obj["name"] = name;
 	oldName = name;
+	$("#search-input").hide();
+	$("#search-button").hide();
 	$("#div_center").load("html/edit_vm.html", function() {
 		if (loggedUser.role == "user") {
 			$("#edit_vm").hide();
@@ -992,23 +1036,29 @@ function deleteVm(){
 	var name = splitted[1];
 	var obj = {};
 	obj["name"] = name;
-	$.post({
-		url : 'rest/vms/delete',
-		contentType : 'application/json',
-		dataType : 'json',
-		data : JSON.stringify(obj),
-		success : function(vms) {
-			if (loggedUser.role == 'admin') {
-				getVirtualMachinesByOrganization();
+	if (!this.clicked) {
+        sure = confirm("Are you sure you want to delete this virtual machine?");
+        this.checked = !sure;
+    }
+	if (sure) {
+		$.post({
+			url : 'rest/vms/delete',
+			contentType : 'application/json',
+			dataType : 'json',
+			data : JSON.stringify(obj),
+			success : function(vms) {
+				if (loggedUser.role == 'admin') {
+					getVirtualMachinesByOrganization();
+				}
+				else {
+					getVirtualMachines();
+				} 
+			},
+			error : function(errorThrown) {
+				toastr.error(errorThrown.responseText);
 			}
-			else {
-				getVirtualMachines();
-			} 
-		},
-		error : function(errorThrown) {
-			toastr.error(errorThrown.responseText);
-		}
-	});	
+		});	
+	}
 }
 
 function searchVirtualMachines(){
@@ -1117,7 +1167,9 @@ function showUsers(users) {
 	$("#search-button").hide();
 	if (users.length > 0) {
 		$("#div_center").load("html/users.html", function() {
-			$("#usersTable td:nth-child(3), th:nth-child(4)").hide(); 
+			if (loggedUser.role != "superadmin") {
+				$("#usersTable td:nth-child(3), th:nth-child(4)").hide(); 
+			}
 			for (let user of users) {
 				addUserTr(user);
 			}
@@ -1313,23 +1365,29 @@ function deleteUser() {
 	var email = splitted[1];
 	var obj = {};
 	obj["email"] = email;
-	$.post({
-		url : 'rest/users/delete',
-		contentType : 'application/json',
-		dataType : 'json',
-		data : JSON.stringify(obj),
-		success : function(users) {
-			if (loggedUser.role == 'admin') {
-				getUsersByOrganization();
+	if (!this.clicked) {
+        sure = confirm("Are you sure you want to delete this user?");
+        this.checked = !sure;
+    }
+	if (sure) {
+		$.post({
+			url : 'rest/users/delete',
+			contentType : 'application/json',
+			dataType : 'json',
+			data : JSON.stringify(obj),
+			success : function(users) {
+				if (loggedUser.role == 'admin') {
+					getUsersByOrganization();
+				}
+				else {
+					getUsers();
+				}
+			},
+			error : function(errorThrown) {
+				toastr.error(errorThrown.responseText);
 			}
-			else {
-				getUsers();
-			}
-		},
-		error : function(errorThrown) {
-			toastr.error(errorThrown.responseText);
-		}
-	});
+		});
+	}
 }
 
 function loadEditUser() {
@@ -1610,18 +1668,24 @@ function deleteCategory() {
 	var name = splitted[1];
 	var obj = {};
 	obj["name"] = name;
-	$.post({
-		url : 'rest/vmcategories/delete',
-		contentType : 'application/json',
-		dataType : 'json',
-		data : JSON.stringify(obj),
-		success : function(categories) {
-			showCategories(categories);
-		},
-		error : function(errorThrown) {
-			toastr.error(errorThrown.responseText);
-		}
-	});
+	if (!this.clicked) {
+        sure = confirm("Are you sure you want to delete this category?");
+        this.checked = !sure;
+    }
+	if (sure) {
+		$.post({
+			url : 'rest/vmcategories/delete',
+			contentType : 'application/json',
+			dataType : 'json',
+			data : JSON.stringify(obj),
+			success : function(categories) {
+				showCategories(categories);
+			},
+			error : function(errorThrown) {
+				toastr.error(errorThrown.responseText);
+			}
+		});
+	}
 }
 
 function loadEditCategory() {
@@ -1845,6 +1909,8 @@ function addDiskTr(disk){
 }
 
 function loadAddDisk() {
+	$("#search-input").hide();
+	$("#search-button").hide();
 	$("#div_center").load("html/add_disk.html", function() {
 		$("organizationDiv").hide();
 		$("#validationName").hide();
@@ -1883,7 +1949,7 @@ $(document).on("change", "#selectOrganization", function(){
 			$("#selectVM").empty();
 			if (len>0){
 				$( "#selectVM" ).prop( "disabled", false );
-				$('#selectVM').append("<option value='"+ "" +"'>Select value</option>");
+				$('#selectVM').append("<option value='"+ "" +"'>No vm</option>");
 				for( var i = 0; i<len; i++){
 		               var vm = vms[i].split(".")[0];
 		               $('#selectVM').append("<option value='"+vm+"'>"+vm+"</option>");
@@ -1908,7 +1974,10 @@ function addDisk() {
 	obj["diskType"] = $('input[name="diskType"]:checked').val();
 	obj["capacity"] = $("#capacity").val();
 	obj["virtualMachine"] = "";
-	if ($("#selectVM").val() != "") {
+	if ($("#selectVM").val() == "No vm") {
+		obj["virtualMachine"] = "";
+	}
+	else if ($("#selectVM").val() != "") {
 		obj["virtualMachine"] = $("#selectVM").val() + "." + $('#selectOrganization').val();
 	}
 	obj["organization"] = $('#selectOrganization').val();
@@ -1931,15 +2000,6 @@ function addDisk() {
 	else {
 		$("#validationOrg").hide();
 		$("#selectOrganization").css("border-color","#ced4da");
-	}
-	if ($("#selectVM").val() == "") {
-		 $("#validationVM").show();
-		 $("#selectVM").css("border-color","red");
-		 validate = false;
-	}
-	else {
-		$("#validationVM").hide();
-		$("#selectVM").css("border-color","#ced4da");
 	}
 	if ( $('input[name="diskType"]:checked').val() == undefined) {
 		 $("#validationType").show();
@@ -1999,24 +2059,30 @@ function deleteDisk() {
 	var name = splitted[1];
 	var obj = {};
 	obj["name"] = name;
-	$.post({
-		url : 'rest/disks/delete',
-		contentType : 'application/json',
-		dataType : 'json',
-		data : JSON.stringify(obj),
-		success : function(disks) {
-			toastr.success("You've successfully deleted disk!");
-			if (loggedUser.role == 'superadmin') {
-				getDisks();
+	if (!this.clicked) {
+        sure = confirm("Are you sure you want to delete this disk?");
+        this.checked = !sure;
+    }
+	if (sure) {
+		$.post({
+			url : 'rest/disks/delete',
+			contentType : 'application/json',
+			dataType : 'json',
+			data : JSON.stringify(obj),
+			success : function(disks) {
+				toastr.success("You've successfully deleted disk!");
+				if (loggedUser.role == 'superadmin') {
+					getDisks();
+				}
+				else {
+					getDisksByOrganization();
+				}
+			},
+			error : function(errorThrown) {
+				toastr.error(errorThrown.responseText);
 			}
-			else {
-				getDisksByOrganization();
-			}
-		},
-		error : function(errorThrown) {
-			toastr.error(errorThrown.responseText);
-		}
-	});
+		});
+	}
 }
 
 function loadEditDisk() {
@@ -2026,6 +2092,8 @@ function loadEditDisk() {
 	var obj = {};
 	obj["name"] = name;
 	oldName = name;
+	$("#search-input").hide();
+	$("#search-button").hide();
 	$("#div_center").load("html/edit_disk.html", function() {
 		if (loggedUser.role == "user") {
 			$("#button_edit_disk").hide();
@@ -2074,11 +2142,16 @@ function fillEditFieldsDisk(disk) {
 		dataType : 'json',
 		data : JSON.stringify(obj),
 		success : function(vms) {
+			let index = 0;
 			var len = vms.length;
 			$("#selectVM").empty();
 			if (len>0){
-				//$( "#selectVM" ).prop( "disabled", false );
+				// $( "#selectVM" ).prop( "disabled", false );
+				$('#selectVM').append("<option value='Not connected'>Not connected</option>");
 				for( var i = 0; i<len; i++){
+					if (disk.virtualMachine == vms[i]) {
+		                	index = i+1;
+		            }
 	                var vm = vms[i].split(".")[0];
 	                $('#selectVM').append("<option value='"+vm+"'>"+vm+"</option>");
 	            }
@@ -2088,18 +2161,21 @@ function fillEditFieldsDisk(disk) {
 				$("#selectVM" ).prop( "disabled", true );
 				$('#selectVM').append("<option value='"+ "" +"'>Not available</option>");
 			}
+			
+			if (disk.virtualMachine == "") {
+		        $("#selectVM").prop("selectedIndex", 0).change();        	
+			}
+			else {
+		        $("#selectVM").prop("selectedIndex", index).change();        	
+
+			}
             
 		},
 		error : function(errorThrown) {
 			toastr.error(errorThrown.responseText);
 		}
 	});
-	if (disk.virtualMachine == "") {
-		$("#selectVM").val("not connected").change();
-	}
-	else {
-		$("#selectVM").val(disk.virtualMachine.split(".")[0]).change();
-	}
+	
 }
 
 function editDisk() {
@@ -2109,34 +2185,23 @@ function editDisk() {
 	obj["diskType"] = $('input[name="diskType"]:checked').val();
 	obj["capacity"] = $("#capacity").val();
 	obj["virtualMachine"] = "";
-	if ($("#selectVM").val() != "") {
+	if ($("#selectVM").val() == "Not connected") {
+		obj["virtualMachine"] = "";
+	}
+	else if ($("#selectVM").val() != "") {
 		obj["virtualMachine"] = $("#selectVM").val() + "." + $('#organization').val();
 	}
 	obj["organization"] = $('#organization').val();
 
-	if ($("#selectVM").val() != "") {
-		obj["virtualMachine"] = $("#selectVM").val() + "." + $('#selectOrganization').val();
-	}
-	obj["organization"] = $('#selectOrganization').val();
-	
 	let validate = true;
 	if ($("#name").val() == "") {
 		 $("#validationName").show();
 		 $("#name").css("border-color","red");
 		 validate = false;
 	}
-	else{
+	else {
 		$("#validationName").hide();
 		$("#name").css("border-color","#ced4da");
-	}
-	if ($("#selectVM").val() == "") {
-		 $("#validationVM").show();
-		 $("#selectVM").css("border-color","red");
-		 validate = false;
-	}
-	else {
-		$("#validationVM").hide();
-		$("#selectVM").css("border-color","#ced4da");
 	}
 	if ($('#capacity').val() == "") {
 		 $("#validationCapacity").show();
@@ -2303,7 +2368,7 @@ $(document).on("change", "#vmOffOn", function(){
 	}
 });
 
-////////////////////////////////////////// admin
+// //////////////////////////////////////// admin
 
 function getVirtualMachinesByOrganization() {
 	searchResults = [];
@@ -2349,7 +2414,7 @@ function getDisksByOrganization() {
 }
 
 
-////////////////////////////////////
+// //////////////////////////////////
 
 $('#search-input').keypress(function (e) {                                       
          e.preventDefault();
@@ -2359,4 +2424,9 @@ function validateEmail(email)
 {
     var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(email);
+}
+
+function validateSpecialChars(name) {
+    var specialChars = /[^a-zA-Z0-9 ]/g;
+    return specialChars.test(name)
 }

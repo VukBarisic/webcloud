@@ -80,8 +80,10 @@ public class VmCategoryService {
 		if (VmCategoryRepository.deleteVmCategory(name)) {
 			return Response.status(200).entity(VmCategoryRepository.getVmCategories()).build();
 		}
+		else {
+			return Response.status(400).entity(HelperMethods.GetJsonValue("Failed to delete, virtual machines exist with selected category")).build();
+		}
 
-		return Response.status(400).entity(HelperMethods.GetJsonValue("Error deleting")).build();
 	}
 
 	@GET

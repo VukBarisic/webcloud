@@ -1,30 +1,27 @@
 package repository;
 
 import java.io.IOException;
-
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import model.User;
-import model.VirtualMachine;
 
 public class UserRepository {
 
 	public static ObjectMapper mapper = new ObjectMapper();
 
+	public static String pathUsers = "C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\users.json";
+
 	public static ArrayList<User> getUsers() {
 
 		try {
 
-			ArrayList<User> users = new ArrayList<User>(Arrays.asList(mapper.readValue(Paths.get(
-					"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\users.json")
-					.toFile(), User[].class)));
+			ArrayList<User> users = new ArrayList<User>(
+					Arrays.asList(mapper.readValue(Paths.get(pathUsers).toFile(), User[].class)));
 
 			return users;
 
@@ -39,9 +36,7 @@ public class UserRepository {
 			String json = mapper.writeValueAsString(user);
 			ArrayList<User> users = getUsers();
 			users.add(user);
-			mapper.writeValue(Paths.get(
-					"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\users.json")
-					.toFile(), users);
+			mapper.writeValue(Paths.get(pathUsers).toFile(), users);
 			return json;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -81,9 +76,7 @@ public class UserRepository {
 		try {
 			ArrayList<User> users = getUsers();
 			users.removeIf(user -> user.getEmail().equals(email));
-			mapper.writeValue(Paths.get(
-					"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\users.json")
-					.toFile(), users);
+			mapper.writeValue(Paths.get(pathUsers).toFile(), users);
 			return true;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -126,9 +119,8 @@ public class UserRepository {
 				}
 			}
 
-			mapper.writeValue(Paths.get(
-					"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\users.json")
-					.toFile(), users);
+			mapper.writeValue(Paths.get(pathUsers).toFile(), users);
+
 			return updatedUser;
 		} catch (IOException e) {
 
@@ -148,9 +140,8 @@ public class UserRepository {
 		}
 		if (changed) {
 			try {
-				mapper.writeValue(Paths.get(
-						"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\users.json")
-						.toFile(), users);
+				mapper.writeValue(Paths.get(pathUsers).toFile(), users);
+
 			} catch (IOException e) {
 
 				e.printStackTrace();
@@ -174,9 +165,8 @@ public class UserRepository {
 			}
 		}
 		try {
-			mapper.writeValue(Paths.get(
-					"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\users.json")
-					.toFile(), users);
+			mapper.writeValue(Paths.get(pathUsers).toFile(), users);
+
 			return true;
 		} catch (IOException e) {
 
@@ -186,10 +176,22 @@ public class UserRepository {
 	}
 
 	public static List<User> getbyOrganization(String organization) {
-		List<User> users = getUsers().stream()
-				.filter(user -> user.getOrganization().equals(organization))
+		List<User> users = getUsers().stream().filter(user -> user.getOrganization().equals(organization))
 				.collect(Collectors.toList());
 		return users;
+	}
+
+	public static void organizationDeleted(String organizationName) {
+		List<User> users = getUsers();
+		users.removeIf(user -> user.getOrganization().equals(organizationName));
+		try {
+			mapper.writeValue(Paths.get(pathUsers).toFile(), users);
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 }

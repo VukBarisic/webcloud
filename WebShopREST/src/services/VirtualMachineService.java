@@ -36,7 +36,7 @@ public class VirtualMachineService {
 		
 		loggedUser = (User) request.getSession().getAttribute("user");
 		
-		if (loggedUser == null || loggedUser.getRole().equals(Role.superadmin)) {
+		if (loggedUser == null || loggedUser.getRole().equals(Role.user)) {
 			return Response.status(403).entity(HelperMethods.GetJsonValue("Unauthorized")).build();
 		}
 

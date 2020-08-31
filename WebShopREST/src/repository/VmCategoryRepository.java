@@ -13,14 +13,15 @@ import model.VMcategory;
 import model.VirtualMachine;
 
 public class VmCategoryRepository {
+
 	public static ObjectMapper mapper = new ObjectMapper();
+	public static String pathVmCategories = "C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\vmcategories.json";
 
 	public static ArrayList<VMcategory> getVmCategories() {
 		try {
 
-			ArrayList<VMcategory> vMcategories = new ArrayList<VMcategory>(Arrays.asList(mapper.readValue(Paths.get(
-					"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\vmcategories.json")
-					.toFile(), VMcategory[].class)));
+			ArrayList<VMcategory> vMcategories = new ArrayList<VMcategory>(
+					Arrays.asList(mapper.readValue(Paths.get(pathVmCategories).toFile(), VMcategory[].class)));
 
 			return vMcategories;
 
@@ -39,10 +40,8 @@ public class VmCategoryRepository {
 					return false;
 				}
 			}
-			vMcategories.removeIf(virtualMachine -> virtualMachine.getName().equals(name));
-			mapper.writeValue(Paths.get(
-					"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\vmcategories.json")
-					.toFile(), vMcategories);
+			vMcategories.removeIf(vmCategory -> vmCategory.getName().equals(name));
+			mapper.writeValue(Paths.get(pathVmCategories).toFile(), vMcategories);
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -62,9 +61,7 @@ public class VmCategoryRepository {
 			ArrayList<VMcategory> vMcategories = getVmCategories();
 			vMcategories.add(vMcategory);
 
-			mapper.writeValue(Paths.get(
-					"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\vmcategories.json")
-					.toFile(), vMcategories);
+			mapper.writeValue(Paths.get(pathVmCategories).toFile(), vMcategories);
 			return true;
 		} catch (IOException e) {
 
@@ -124,11 +121,10 @@ public class VmCategoryRepository {
 					c.setNumOfGpuCores(gpu);
 					c.setName(data.get("name"));
 					VmRepository.categoryUpdated(c, data.get("name"));
-					}
 				}
+			}
 
-			mapper.writeValue(Paths.get(
-					"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\vmcategories.json")
+			mapper.writeValue(Paths.get(pathVmCategories)
 					.toFile(), categories);
 			return true;
 		} catch (IOException e) {

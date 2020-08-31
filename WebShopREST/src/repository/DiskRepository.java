@@ -17,14 +17,15 @@ import model.VirtualMachine;
 public class DiskRepository {
 
 	public static ObjectMapper mapper = new ObjectMapper();
+	public static String pathDisks = "C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\disks.json";
+	public static String pathVms = "C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\virtualmachines.json";
 
 	public static ArrayList<Disk> getDisks() {
 
 		try {
 
-			ArrayList<Disk> disks = new ArrayList<Disk>(Arrays.asList(mapper.readValue(Paths.get(
-					"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\disks.json")
-					.toFile(), Disk[].class)));
+			ArrayList<Disk> disks = new ArrayList<Disk>(
+					Arrays.asList(mapper.readValue(Paths.get(pathDisks).toFile(), Disk[].class)));
 
 			return disks;
 
@@ -70,17 +71,13 @@ public class DiskRepository {
 				for (VirtualMachine vm : virtualMachines) {
 					if (vm.getName().equals(data.get("virtualMachine"))) {
 						vm.getDisks().add(disk.getName());
-						mapper.writeValue(Paths.get(
-								"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\virtualmachines.json")
-								.toFile(), virtualMachines);
+						mapper.writeValue(Paths.get(pathVms).toFile(), virtualMachines);
 					}
 				}
 
 			}
 
-			mapper.writeValue(Paths.get(
-					"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\disks.json")
-					.toFile(), disks);
+			mapper.writeValue(Paths.get(pathDisks).toFile(), disks);
 			return true;
 		} catch (IOException e) {
 
@@ -92,10 +89,14 @@ public class DiskRepository {
 	public static boolean deleteDisk(String name) {
 		try {
 			ArrayList<Disk> disks = getDisks();
+			for (Disk d : disks) {
+				if (d.getName().equals(name)) {
+					VmRepository.diskDeleted(d);
+				}
+			}
 			disks.removeIf(disk -> disk.getName().equals(name));
-			mapper.writeValue(Paths.get(
-					"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\disks.json")
-					.toFile(), disks);
+
+			mapper.writeValue(Paths.get(pathDisks).toFile(), disks);
 			return true;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -108,8 +109,7 @@ public class DiskRepository {
 		List<Disk> disks = new ArrayList<>();
 		if (organization == "") {
 			disks = getDisks();
-		}
-		else {
+		} else {
 			disks = getDisksByCompany(organization);
 		}
 		disks = disks.stream().filter(disk -> disk.getName().toLowerCase().contains(name.toLowerCase()))
@@ -135,9 +135,8 @@ public class DiskRepository {
 				}
 			}
 
-			mapper.writeValue(Paths.get(
-					"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\disks.json")
-					.toFile(), disks);
+			mapper.writeValue(Paths.get(pathDisks).toFile(), disks);
+
 			return true;
 		} catch (IOException e) {
 
@@ -150,8 +149,7 @@ public class DiskRepository {
 		List<Disk> disks = new ArrayList<>();
 		if (organization == "") {
 			disks = getDisks();
-		}
-		else {
+		} else {
 			disks = getDisksByCompany(organization);
 		}
 		int capacityFrom = Integer.parseInt(data.get("capacityFrom"));
@@ -174,9 +172,8 @@ public class DiskRepository {
 		}
 		if (changed) {
 			try {
-				mapper.writeValue(Paths.get(
-						"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\disks.json")
-						.toFile(), disks);
+				mapper.writeValue(Paths.get(pathDisks).toFile(), disks);
+
 			} catch (IOException e) {
 
 				e.printStackTrace();
@@ -184,12 +181,58 @@ public class DiskRepository {
 		}
 
 	}
-	
+
 	public static List<Disk> getDisksByCompany(String companyName) {
-		List<Disk> disks = getDisks().stream()
-				.filter(disk -> disk.getOrganization().equals(companyName))
+		List<Disk> disks = getDisks().stream().filter(disk -> disk.getOrganization().equals(companyName))
 				.collect(Collectors.toList());
 		return disks;
+	}
+
+	public static void vmUpdated(String oldName, String newName) {
+		List<Disk> disks = getDisks();
+		disks.stream().forEach(disk -> {
+			if (disk.getVirtualMachine().equals(oldName)) {
+				disk.setVirtualMachine(newName);
+			}
+		});
+		try
+
+		{
+			mapper.writeValue(Paths.get(pathDisks).toFile(), disks);
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public static void vmDeleted(String name) {
+		List<Disk> disks = getDisks();
+		for (Disk d : disks) {
+			if (d.getVirtualMachine().equals(name)) {
+				d.setVirtualMachine("");
+			}
+		}
+		try {
+			mapper.writeValue(Paths.get(pathDisks).toFile(), disks);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	public static void organizationDeleted(String organizationName) {
+		List<Disk> disks = getDisks();
+		disks.removeIf(disk -> disk.getOrganization().equals(organizationName));
+		try {
+			mapper.writeValue(Paths.get(pathDisks).toFile(), disks);
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 
 }

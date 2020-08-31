@@ -25,13 +25,13 @@ public class VmRepository {
 
 	public static ObjectMapper mapper = new ObjectMapper();
 
+	public static String pathVms = "C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\virtualmachines.json";
+
 	public static ArrayList<VirtualMachine> getVirtualMachines() {
 		try {
 
 			ArrayList<VirtualMachine> virtualMachines = new ArrayList<VirtualMachine>(
-					Arrays.asList(mapper.readValue(Paths.get(
-							"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\virtualmachines.json")
-							.toFile(), VirtualMachine[].class)));
+					Arrays.asList(mapper.readValue(Paths.get(pathVms).toFile(), VirtualMachine[].class)));
 
 			return virtualMachines;
 
@@ -51,20 +51,13 @@ public class VmRepository {
 	public static boolean deleteVirtualMachine(String name) {
 		try {
 			ArrayList<VirtualMachine> virtualMachines = getVirtualMachines();
-			ArrayList<Organization> organizations = OrganizationRepository.getOrganizations();
 			virtualMachines.removeIf(virtualMachine -> virtualMachine.getName().equals(name));
 
-			for (Organization org : organizations) {
-				org.getResources().removeIf(resource -> resource.equals(name));
-			}
+			DiskRepository.vmDeleted(name);
 
-			mapper.writeValue(Paths.get(
-					"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\virtualmachines.json")
-					.toFile(), virtualMachines);
+			OrganizationRepository.vmDeleted(name);
 
-			mapper.writeValue(Paths.get(
-					"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\organizations.json")
-					.toFile(), organizations);
+			mapper.writeValue(Paths.get(pathVms).toFile(), virtualMachines);
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -95,9 +88,8 @@ public class VmRepository {
 			mapper.writeValue(Paths.get(
 					"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\organizations.json")
 					.toFile(), organizations);
-			mapper.writeValue(Paths.get(
-					"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\virtualmachines.json")
-					.toFile(), virtualMachines);
+			mapper.writeValue(Paths.get(pathVms).toFile(), virtualMachines);
+
 			return true;
 		} catch (IOException e) {
 
@@ -120,8 +112,7 @@ public class VmRepository {
 		List<VirtualMachine> vms = new ArrayList<>();
 		if (organization == "") {
 			vms = getVirtualMachines();
-		}
-		else {
+		} else {
 			vms = getVirtualMachinesByCompany(organization);
 		}
 		List<VirtualMachine> virtualMachines = vms.stream()
@@ -161,17 +152,15 @@ public class VmRepository {
 		for (VirtualMachine vm : virtualMachines) {
 			if (vm.getDisks().contains(disk.getName()) && !vm.getName().equals(disk.getVirtualMachine())) {
 				vm.getDisks().removeIf(diskName -> diskName.equals(disk.getName()));
-			}
-			if (vm.getName().equals(disk.getVirtualMachine()) && !vm.getDisks().contains(disk.getName())) {
+			} else if (vm.getName().equals(disk.getVirtualMachine()) && !vm.getDisks().contains(disk.getName())) {
 				vm.getDisks().add(disk.getName());
 			}
 
 		}
 
 		try {
-			mapper.writeValue(Paths.get(
-					"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\virtualmachines.json")
-					.toFile(), virtualMachines);
+			mapper.writeValue(Paths.get(pathVms).toFile(), virtualMachines);
+
 		} catch (IOException e) {
 
 			e.printStackTrace();
@@ -179,12 +168,11 @@ public class VmRepository {
 	}
 
 	public static List<VirtualMachine> filterVirtualMachines(HashMap<String, String> data, String organization) {
-		
+
 		List<VirtualMachine> virtualMachines = new ArrayList<>();
 		if (organization == "") {
 			virtualMachines = getVirtualMachines();
-		}
-		else {
+		} else {
 			virtualMachines = getVirtualMachinesByCompany(organization);
 		}
 		if (!data.get("ramFrom").equals("")) {
@@ -234,9 +222,8 @@ public class VmRepository {
 		}
 
 		try {
-			mapper.writeValue(Paths.get(
-					"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\virtualmachines.json")
-					.toFile(), vms);
+			mapper.writeValue(Paths.get(pathVms).toFile(), vms);
+
 			return true;
 		} catch (IOException e) {
 
@@ -257,9 +244,8 @@ public class VmRepository {
 		}
 		if (changed) {
 			try {
-				mapper.writeValue(Paths.get(
-						"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\virtualmachines.json")
-						.toFile(), virtualMachines);
+				mapper.writeValue(Paths.get(pathVms).toFile(), virtualMachines);
+
 			} catch (IOException e) {
 
 				e.printStackTrace();
@@ -281,13 +267,13 @@ public class VmRepository {
 					vm.setvMcategory(vMcategory);
 					if (!data.get("oldName").equals(data.get("name"))) {
 						OrganizationRepository.vmUpdated(data.get("oldName"), data.get("name"));
+						DiskRepository.vmUpdated(data.get("oldName"), data.get("name"));
 					}
 				}
 			}
 
-			mapper.writeValue(Paths.get(
-					"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\virtualmachines.json")
-					.toFile(), virtualMachines);
+			mapper.writeValue(Paths.get(pathVms).toFile(), virtualMachines);
+
 			return true;
 		} catch (IOException e) {
 
@@ -309,13 +295,42 @@ public class VmRepository {
 		}
 		if (changed) {
 			try {
-				mapper.writeValue(Paths.get(
-						"C:\\Users\\Vuk\\Desktop\\Faks\\5_semestar\\Web\\vezbe\\10-REST\\WebShopREST\\WebContent\\files\\virtualmachines.json")
-						.toFile(), virtualMachines);
+				mapper.writeValue(Paths.get(pathVms).toFile(), virtualMachines);
+
 			} catch (IOException e) {
 
 				e.printStackTrace();
 			}
+		}
+
+	}
+
+	public static void diskDeleted(Disk disk) {
+		List<VirtualMachine> vms = getVirtualMachines();
+		for (VirtualMachine vm : vms) {
+			if (vm.getName().equals(disk.getVirtualMachine())) {
+				vm.getDisks().removeIf(d -> d.equals(disk.getName()));
+			}
+		}
+		try {
+			mapper.writeValue(Paths.get(pathVms).toFile(), vms);
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	public static void organizationDeleted(String organizationName) {
+		List<VirtualMachine> vms = getVirtualMachines();
+		vms.removeIf(vm -> vm.getOrganization().equals(organizationName));
+		try {
+			mapper.writeValue(Paths.get(pathVms).toFile(), vms);
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 	}

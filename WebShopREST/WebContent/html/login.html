@@ -1,97 +1,99 @@
 <style>
-form {border: 3px solid #f1f1f1;
+form {
+	border: 3px solid #f1f1f1;
 	height: 80%;
-	width: 80%;}
+	width: 80%;
+}
 
 input[type=text], input[type=password] {
-  width: 100%;
-  padding: 12px 20px;
-  margin: 8px 0;
-  display: inline-block;
-  border: 1px solid #ccc;
-  box-sizing: border-box;
+	width: 100%;
+	padding: 12px 20px;
+	margin: 8px 0;
+	display: inline-block;
+	border: 1px solid #ccc;
+	box-sizing: border-box;
 }
 
 button {
-  background-color: #00ace6;
-  color: white;
-  padding: 14px 20px;
-  margin: 8px 0;
-  border: none;
-  cursor: pointer;
-  width: 100%;
+	background-color: #00ace6;
+	color: white;
+	padding: 14px 20px;
+	margin: 8px 0;
+	border: none;
+	cursor: pointer;
+	width: 100%;
 }
 
 button:hover {
-  opacity: 0.8;
+	opacity: 0.8;
 }
 
 .cancelbtn {
-  width: auto;
-  padding: 10px 18px;
-  background-color: #f44336;
+	width: auto;
+	padding: 10px 18px;
+	background-color: #f44336;
 }
 
 .imgcontainer {
-  text-align: center;
-  margin: 24px 0 12px 0;
+	text-align: center;
+	margin: 24px 0 12px 0;
 }
 
 img.avatar {
-  width: 40%;
-  border-radius: 50%;
+	width: 40%;
+	border-radius: 50%;
 }
 
 .container {
-  padding: 16px;
+	padding: 16px;
 }
 
 span.psw {
-  float: right;
-  padding-top: 16px;
+	float: right;
+	padding-top: 16px;
 }
 
 @media screen and (max-width: 300px) {
-  span.psw {
-     display: block;
-     float: none;
-  }
-  .cancelbtn {
-     width: 100%;
-  }
+	span.psw {
+		display: block;
+		float: none;
+	}
+	.cancelbtn {
+		width: 100%;
+	}
 }
 
 .header {
-  height: 85%;
-  width: 80%;
-  text-align: center;
-  background: #00ace6;
-  color: white;
-  font-size: 20px;
+	height: 85%;
+	width: 80%;
+	text-align: center;
+	background: #00ace6;
+	color: white;
+	font-size: 20px;
 }
 </style>
 
 <script src="js/login.js"></script>
 
 <div class="header">
-  <h1>Welcome to Web CLoud</h1>
+	<h1>Welcome to Web CLoud</h1>
 </div>
 <div class="center_align">
 
-	<form method = "post">
+	<form method="post">
 		<div class="imgcontainer">
 			<img src="imgs/cloud.jpg" alt="Avatar" class="avatar">
 		</div>
 
 		<div id="login_div" class="container">
-			<label for="uname"><b>Username</b></label> <input type="text"
-				id="email_login" placeholder="Enter Username" name="uname" required>
-			<span class="error"><p id="email_error"></p></span>
-			<label
-				for="psw"><b>Password</b></label> <input type="password" id = "password_login"
-				placeholder="Enter Password" name="psw" required>
-			 <span class="error"><p id="pass_error"></p></span>
-			<button type ="button" id="button_login">login</button>
+			<label><b>Email</b></label> <input type="text" id="email_login"
+				placeholder="Enter email"> <small id="validationEmail"
+				class="form-text text-muted">Field can't be empty</small> <label
+				for="psw"><b>Password</b></label> <input type="password"
+				id="password_login" placeholder="Enter Password" name="psw">
+			<small id="validationPass" class="form-text text-muted">Field
+				can't be empty</small>
+			<button type="button" id="button_login">login</button>
 		</div>
 	</form>
 </div>
